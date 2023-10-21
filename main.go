@@ -1,6 +1,9 @@
 package main
 
-import "go_chat/initialize"
+import (
+	"go_chat/initialize"
+	"go_chat/router"
+)
 
 func main() {
 	// 初始化日志
@@ -9,4 +12,10 @@ func main() {
 	initialize.InitConfig()
 	// 初始化数据库
 	initialize.InitDB()
+	// 启动端口监听
+	r := router.Router()
+	err := r.Run(":8080")
+	if err != nil {
+		panic(err)
+	}
 }

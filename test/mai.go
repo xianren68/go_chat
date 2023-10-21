@@ -13,7 +13,7 @@ func main() {
 		panic(err)
 	}
 	// 迁移数据库
-	err = db.AutoMigrate(&models.UserBasic{})
+	err = db.AutoMigrate(&models.UserBasic{}, &models.Relation{})
 	if err != nil {
 		panic(err)
 	}

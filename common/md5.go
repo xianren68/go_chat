@@ -1,5 +1,5 @@
-// Package public 公共目录
-package public
+// Package common 公共目录
+package common
 
 import (
 	"crypto/md5"

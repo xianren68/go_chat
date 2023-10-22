@@ -103,7 +103,7 @@ func FindUserByNameAndPwd(name, password string) (user *models.UserBasic, err er
 	user = &models.UserBasic{}
 	tx := global.DB.Where("name= ? and pass_word= ?", name, password).First(user)
 	if tx.RowsAffected == 0 {
-		err = errors.New("this record does not exist")
+		err = errors.New("wrong password")
 	}
 	return
 }

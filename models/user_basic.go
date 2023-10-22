@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// UserBasic 用户结构体
 type UserBasic struct {
 	gorm.Model    // 包含唯一id，更新/删除时间等
 	Name          string

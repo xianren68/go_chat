@@ -13,10 +13,11 @@ func FriendList(c *gin.Context) {
 	// 获取数据
 	list, err := dao.FriendList(value.(uint))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"code": -1,
-			"msg":  err.Error(),
-		})
+		//c.JSON(http.StatusOK, gin.H{
+		//	"code": -1,
+		//	"msg":  err.Error(),
+		//})
+		errReply(c, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -32,18 +33,20 @@ func AddFriend(c *gin.Context) {
 	value, _ := c.Get("userId")
 	name := c.PostForm("name")
 	if name == "" {
-		c.JSON(http.StatusOK, gin.H{
-			"code": -1,
-			"msg":  "userName is null",
-		})
+		//c.JSON(http.StatusOK, gin.H{
+		//	"code": -1,
+		//	"msg":  "userName is null",
+		//})
+		errReply(c, "userName is null")
 		return
 	}
-	code, err := dao.AddFriendByName(value.(uint), name)
+	_, err := dao.AddFriendByName(value.(uint), name)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"code": code,
-			"msg":  err.Error(),
-		})
+		//c.JSON(http.StatusOK, gin.H{
+		//	"code": -1,
+		//	"msg":  err.Error(),
+		//})
+		errReply(c, err.Error())
 		return
 	}
 	okReply(c)

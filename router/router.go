@@ -28,6 +28,9 @@ func Router() *gin.Engine {
 	{
 		relation.GET("/friendlist", service.FriendList)
 		relation.POST("/addfriend", service.AddFriend)
+		relation.GET("/grouplist", service.GetGroupList)
+		relation.POST("/newgroup", service.NewGroup)
+		relation.POST("joingroup", service.JoinGroup)
 	}
 	return r
 }

@@ -2,6 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
+// Relation 关系结构体
 type Relation struct {
 	gorm.Model
 	OwnerId  uint   // 谁的关系信息

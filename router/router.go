@@ -22,6 +22,7 @@ func Router() *gin.Engine {
 		user.GET("/list", service.List)
 		user.DELETE("/delete", service.DeleteUser)
 		user.PUT("/update", service.UpdateUser)
+		user.GET("/sendmsg", service.SendUserMsg)
 	}
 	// 关系相关
 	relation := auth.Group("relation")

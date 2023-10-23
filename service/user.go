@@ -222,3 +222,8 @@ func errReply(ctx *gin.Context, err string) {
 		"msg":  err,
 	})
 }
+
+// SendUserMsg 发送消息
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c)
+}

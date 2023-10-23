@@ -2,13 +2,16 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"go_chat/middleware"
 	"go_chat/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Router() *gin.Engine {
 	r := gin.Default()
+	// 跨域
+	r.Use(middleware.Cors())
 	// v1版本
 	v1 := r.Group("v1")
 	v1.POST("/login", service.Login)

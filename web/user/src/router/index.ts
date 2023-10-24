@@ -5,7 +5,12 @@ const routes = [
         path:'/',
         name:'main',
         // 懒加载
-        component:()=>import('../views/main.vue')
+        component:()=>import('../views/main.vue'),
+        children:[{
+            name:'contact',
+            path:'contact',
+            component:()=>import('../views/main/contact.vue')
+        }]
 
     },
     {
@@ -28,8 +33,8 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to)=>{
     let token = localStorage.getItem("token")
-    if(!token && to.name != 'login'){
-        return {name:'login'}
+    if(!token && to.name != 'ready'){
+        return {name:'ready'}
     }
 })
 export default router

@@ -3,7 +3,7 @@
         <div class="bg"></div>
         <main>
             <asideVue></asideVue>
-            
+          <router-view></router-view>
         </main>
     </div>
 </template>
@@ -23,23 +23,22 @@ import asideVue from '../components/aside.vue';
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: url("../assets/img/texture-rain-bg.png");
-            background-size: cover;
-            background-position: 100%;
-            filter: blur(5px);
+            background-color: #fff;
         }
         main{
+          padding: 20px;
             position: fixed;
             display: flex;
             border-radius: 15px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             top:0;
             left: 0;
             right: 0;
             bottom: 0;
             margin: auto;
-            width: 1200px;
-            height: 580px;
-            background-color: aliceblue;
+            width: 1000px;
+            height: 540px;
+            background-color: #f9f9fd;
         }
     }
 </style>

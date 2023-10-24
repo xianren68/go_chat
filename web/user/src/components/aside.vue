@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import {useRouter} from "vue-router";
+const router = useRouter()
 // 被选中的项
 let active: HTMLElement
 // 跳转到消息页
@@ -31,6 +33,8 @@ const message = (e:Event)=>{
 // 跳转到联系人页
 const contact = (e:Event)=>{
     animation(e.currentTarget as HTMLElement)
+  router.push('contact')
+
 }
 // 跳转到设置页
 const setting = (e:Event)=>{
@@ -60,10 +64,10 @@ const animation = (e: HTMLElement) => {
     flex-direction: column;
     align-items: center;
     height: 100%;
-    width: 4%;
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
-    background: linear-gradient(to bottom, #c0c0aa, #1cefff);
+    width: 60px;
+    border-radius: 10px;
+    background-color: #484aa1;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 
     .avatar {
         margin-top: 30px;

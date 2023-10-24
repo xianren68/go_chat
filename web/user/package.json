@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "axios": "^1.5.1",
+    "nprogresse": "^0.2.6",
+    "pinia": "^2.1.7",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5"
   },

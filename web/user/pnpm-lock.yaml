@@ -8,6 +8,12 @@ dependencies:
   axios:
     specifier: ^1.5.1
     version: registry.npmmirror.com/axios@1.5.1
+  nprogresse:
+    specifier: ^0.2.6
+    version: registry.npmmirror.com/nprogresse@0.2.6
+  pinia:
+    specifier: ^2.1.7
+    version: registry.npmmirror.com/pinia@2.1.7(typescript@5.2.2)(vue@3.3.6)
   vue:
     specifier: ^3.3.4
     version: registry.npmmirror.com/vue@3.3.6(typescript@5.2.2)
@@ -784,6 +790,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  registry.npmmirror.com/nprogresse@0.2.6:
+    resolution: {integrity: sha512-980Eo6S4nNjT7SqPprOhwQO34jGj58Jh+oR4h6/3GyBwi38z1+Y6meG6UKGs8larlAT2Cs64W5LDTNfz0qE2/Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/nprogresse/-/nprogresse-0.2.6.tgz}
+    name: nprogresse
+    version: 0.2.6
+    dev: false
+
   registry.npmmirror.com/ometa@0.2.2:
     resolution: {integrity: sha512-LZuoK/yjU3FvrxPjUXUlZ1bavCfBPqauA7fsNdwi+AVhRdyk2IzgP3JRnevvjzQ6fKHdUw8YISshf53FmpHrng==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ometa/-/ometa-0.2.2.tgz}
     name: ometa
@@ -802,6 +814,27 @@ packages:
     version: 2.3.1
     engines: {node: '>=8.6'}
     dev: true
+
+  registry.npmmirror.com/pinia@2.1.7(typescript@5.2.2)(vue@3.3.6):
+    resolution: {integrity: sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/pinia/-/pinia-2.1.7.tgz}
+    id: registry.npmmirror.com/pinia/2.1.7
+    name: pinia
+    version: 2.1.7
+    peerDependencies:
+      '@vue/composition-api': ^1.4.0
+      typescript: '>=4.4.4'
+      vue: ^2.6.14 || ^3.3.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      '@vue/devtools-api': registry.npmmirror.com/@vue/devtools-api@6.5.1
+      typescript: registry.npmmirror.com/typescript@5.2.2
+      vue: registry.npmmirror.com/vue@3.3.6(typescript@5.2.2)
+      vue-demi: registry.npmmirror.com/vue-demi@0.14.6(vue@3.3.6)
+    dev: false
 
   registry.npmmirror.com/postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/postcss/-/postcss-8.4.31.tgz}
@@ -935,6 +968,24 @@ packages:
     optionalDependencies:
       fsevents: registry.npmmirror.com/fsevents@2.3.3
     dev: true
+
+  registry.npmmirror.com/vue-demi@0.14.6(vue@3.3.6):
+    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-demi/-/vue-demi-0.14.6.tgz}
+    id: registry.npmmirror.com/vue-demi/0.14.6
+    name: vue-demi
+    version: 0.14.6
+    engines: {node: '>=12'}
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: registry.npmmirror.com/vue@3.3.6(typescript@5.2.2)
+    dev: false
 
   registry.npmmirror.com/vue-router@4.2.5(vue@3.3.6):
     resolution: {integrity: sha512-DIUpKcyg4+PTQKfFPX88UWhlagBEBEfJ5A8XDXRJLUnZOvcpMF8o/dnL90vpVkGaPbjvXazV/rC1qBKrZlFugw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-router/-/vue-router-4.2.5.tgz}

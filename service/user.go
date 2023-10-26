@@ -17,13 +17,12 @@ import (
 
 // List 获取用户列表
 func List(ctx *gin.Context) {
-	list, err := dao.GetUserList()
-	if err != nil {
-		//ctx.JSON(200, gin.H{"code": -1, "msg": "获取用户列表失败"})
-		errReply(ctx, "failed to get user list")
-		return
-	}
-	ctx.JSON(http.StatusOK, list)
+	list := dao.GetUserList()
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "ok",
+		"data": list,
+	})
 }
 
 // Login 登录
@@ -32,41 +31,40 @@ func Login(ctx *gin.Context) {
 	ctx.BindJSON(&info)
 	name, pwd := info["name"], info["password"]
 	if name == "" || pwd == "" {
-		//ctx.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "username or password is null",
-		//})
-		errReply(ctx, "username or password is null")
+		ctx.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "用户名或密码为空",
+		})
 		return
 	}
-	user, err := dao.FindUserByName(name)
-	if err != nil {
+	user, code := dao.FindUserByName(name)
+	if code != 0 {
 		//ctx.JSON(200, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
 	// 加密密码
 	pwd = common.SaltPassword(pwd, user.Salt)
 	// 查询是否存在
-	user, err = dao.FindUserByNameAndPwd(name, pwd)
-	if err != nil {
+	user, code = dao.FindUserByNameAndPwd(name, pwd)
+	if code != 0 {
 		//ctx.JSON(200, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
 	// 添加token
-	token, err := middleware.GenerateToken(user.ID)
-	if err != nil {
-		zap.S().Info(err)
+	token, code := middleware.GenerateToken(user.ID)
+	if code != 0 {
+		return
 	}
 	ctx.Header("Authorization", "Bearer "+token)
-	okReply(ctx)
+	common.OkReply(ctx)
 }
 
 // NewUser 添加用户
@@ -75,11 +73,10 @@ func NewUser(ctx *gin.Context) {
 	err := ctx.BindJSON(&info)
 	if err != nil {
 		zap.S().Warn("failed to read arguments ", err)
-		//ctx.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "failed to read arguments",
-		//})
-		errReply(ctx, "failed to read arguments")
+		ctx.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "请求参数错误",
+		})
 		return
 	}
 	name := info["name"]
@@ -87,30 +84,28 @@ func NewUser(ctx *gin.Context) {
 	// 确认密码
 	rePassword := info["identity"]
 	if name == "" || password == "" || rePassword == "" {
-		//ctx.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "username and password can not be empty",
-		//})
-		errReply(ctx, "username and password can not be empty")
+		ctx.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "用户名和密码不能为空",
+		})
 		return
 	}
 	// 判断两次密码是否一致
 	if password != rePassword {
-		//ctx.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "two passwords are inconsistent",
-		//})
-		errReply(ctx, "two passwords are inconsistent")
+		ctx.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "两次密码不一致",
+		})
 		return
 	}
 	// 判断用户名是否被占用
-	err = dao.UserExist(name)
-	if err != nil {
+	code := dao.UserExist(name)
+	if code != 0 {
 		//ctx.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
 	// 生成盐值
@@ -118,7 +113,7 @@ func NewUser(ctx *gin.Context) {
 	// 对密码加密
 	pwd := common.SaltPassword(password, salt)
 	t := time.Now()
-	err = dao.CreateUser(&models.UserBasic{
+	code = dao.CreateUser(&models.UserBasic{
 		Name:          name,
 		PassWord:      pwd,
 		Salt:          salt,
@@ -126,15 +121,15 @@ func NewUser(ctx *gin.Context) {
 		HeartBeatTime: &t,
 		LoginOutTime:  &t,
 	})
-	if err != nil {
+	if code != 0 {
 		//ctx.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
-	okReply(ctx)
+	common.OkReply(ctx)
 }
 
 // UpdateUser 更新用户信息
@@ -143,21 +138,20 @@ func UpdateUser(ctx *gin.Context) {
 	err := ctx.BindJSON(user)
 	if err != nil {
 		zap.S().Warn("failed to read arguments ", err)
-		//ctx.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "failed to read arguments",
-		//})
-		errReply(ctx, "failed to read arguments")
+		ctx.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "请求参数错误",
+		})
 		return
 	}
 	// 判断要更新的用户名是否已经存在
-	err = dao.UserExist(user.Name)
-	if err != nil {
+	code := dao.UserExist(user.Name)
+	if code != 0 {
 		//ctx.JSON(200, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
 	// 如果存在密码的改变，继续加密
@@ -168,16 +162,16 @@ func UpdateUser(ctx *gin.Context) {
 		user.Salt = salt
 	}
 	// 更新
-	err = dao.UpdateUser(user)
-	if err != nil {
+	code = dao.UpdateUser(user)
+	if code != 0 {
 		//ctx.JSON(200, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
-	okReply(ctx)
+	common.OkReply(ctx)
 }
 
 // DeleteUser 注销账号
@@ -186,41 +180,24 @@ func DeleteUser(ctx *gin.Context) {
 	id, err := strconv.Atoi(Id)
 	if err != nil {
 		zap.S().Info("id is not compliant")
-		//ctx.JSON(http.StatusOK, gin.H{
-		//	"code": -1,
-		//	"msg":  "id is not compliant",
-		//})
-		errReply(ctx, "id is not compliant")
+		ctx.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "请求参数有误",
+		})
 		return
 	}
 	user := &models.UserBasic{}
 	user.ID = uint(id)
-	err = dao.DeleteUser(user)
-	if err != nil {
+	code := dao.DeleteUser(user)
+	if code != 0 {
 		//ctx.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(ctx, err.Error())
+		common.ErrReply(ctx, code)
 		return
 	}
-	okReply(ctx)
-}
-
-// 成功回复
-func okReply(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "ok",
-	})
-}
-
-// 失败回复
-func errReply(ctx *gin.Context, err string) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": -1,
-		"msg":  err,
-	})
+	common.OkReply(ctx)
 }
 
 // SendUserMsg 发送消息

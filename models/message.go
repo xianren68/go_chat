@@ -2,18 +2,19 @@ package models
 
 import (
 	"encoding/json"
+	"net"
+	"net/http"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 	"gopkg.in/fatih/set.v0"
-	"gorm.io/gorm"
-	"net/http"
-	"sync"
 )
 
 // Message 消息结构体(表)
 type Message struct {
-	gorm.Model
+	Model
 	FormId   uint   // 发送者id
 	TargetId uint   // 接收者id
 	Type     int    // 发送消息类型 （群发，私聊）
@@ -82,7 +83,10 @@ func sendProc(node *Node) {
 	}
 }
 
-// 接收消息
+// 全局channel
+var upSendMsg = make(chan []byte, 1024)
+
+// （接收客户端要发送的消息）
 func recProc(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
@@ -90,25 +94,94 @@ func recProc(node *Node) {
 			zap.S().Info("failed to read message")
 			return
 		}
-		// 解析消息
-		msg := &Message{}
-		err = json.Unmarshal(data, msg)
+		// 将消息写入全局channel
+		brodMsg(data)
+	}
+}
+
+// 将消息写入全局channel
+func brodMsg(data []byte) {
+	upSendMsg <- data
+}
+
+func init() {
+	go udpRecProc()
+	go udpSendProc()
+}
+
+// 将消息写入udp服务器
+func udpSendProc() {
+	uC, err := net.DialUDP("udp", nil, &net.UDPAddr{
+		IP:   net.IPv4(127, 0, 0, 1),
+		Port: 5000,
+		Zone: "",
+	})
+	if err != nil {
+		zap.S().Info("failed to connect udp")
+		panic("failed to connect udp")
+	}
+	defer uC.Close()
+	for bytes := range upSendMsg {
+		_, err = uC.Write(bytes)
 		if err != nil {
-			zap.S().Info("failed to parse message")
-		}
-		// 判断消息类型
-		switch msg.Type {
-		// 私聊
-		case 1:
-			// 拿到接收人的node
-			n, ok := clientMap[msg.TargetId]
-			// 不在线/不存在
-			if !ok {
-				zap.S().Info("client is not exist")
-				return
-			}
-			// 写入消息
-			n.Data <- data
+			zap.S().Info("failed to write udp")
+			continue
 		}
 	}
+}
+
+// 开启udp服务
+func udpRecProc() {
+	uC, err := net.ListenUDP("udp", &net.UDPAddr{
+		IP:   net.IPv4(127, 0, 0, 1),
+		Port: 5000,
+		Zone: "",
+	})
+	if err != nil {
+		zap.S().Info("failed to listen upd")
+		panic("failed to listen upd")
+	}
+	// 获取客户端数据
+	for {
+		var buf = [1024]byte{}
+		var n int
+		n, err = uC.Read(buf[:])
+		if err != nil {
+			zap.S().Info("failed to get message")
+			// 略过消息，继续下一条
+			continue
+		}
+		// 解析消息
+		disPatch(buf[:n])
+	}
+}
+
+// 解析聊天
+func disPatch(data []byte) {
+	// 解析消息
+	msg := &Message{}
+	err := json.Unmarshal(data, msg)
+	if err != nil {
+		zap.S().Info("failed to parse message")
+		return
+	}
+	// 判断聊天类型
+	switch msg.Type {
+	// 私聊
+	case 1:
+		sendMsgAndSave(msg.TargetId, data)
+	case 2:
+		// sendGroup(msg.FormId, msg.TargetId)
+	}
+
+}
+func sendMsgAndSave(id uint, msg []byte) {
+	rwLocker.Lock()
+	node, ok := clientMap[id]
+	rwLocker.Unlock()
+	if !ok {
+		zap.S().Info("user is not online")
+		return
+	}
+	node.Data <- msg
 }

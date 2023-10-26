@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"net/http"
+	"go_chat/common"
 	"strings"
 	"time"
 )
@@ -24,7 +24,7 @@ type Claims struct {
 }
 
 // GenerateToken 使用id生成token
-func GenerateToken(userId uint) (string, error) {
+func GenerateToken(userId uint) (string, int) {
 	// 设置token过期时间
 	nowTime := time.Now()
 	expireTime := nowTime.Add(24 * 2 * time.Hour)
@@ -42,27 +42,27 @@ func GenerateToken(userId uint) (string, error) {
 	// token转化为字符串
 	signedString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		return "", errors.New("generate token failed " + err.Error())
+		return "", 1006
 	}
-	return signedString, nil
+	return signedString, 0
 
 }
 
 // ParseToken 解析token
-func ParseToken(token string) (claims *Claims, err error) {
+func ParseToken(token string) (claims *Claims, code int) {
 	claims = &Claims{}
 	withClaims, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 	if err != nil {
 		zap.S().Info("failed to parse token ", err)
-		err = errors.New("failed to parse token")
+		code = 1006
 		return
 	}
 	if myclaims, ok := withClaims.Claims.(*Claims); ok && withClaims.Valid {
-		return myclaims, nil
+		return myclaims, 0
 	}
-	err = errors.New("failed to parse token")
+	code = 1006
 	return
 }
 
@@ -73,43 +73,35 @@ func Jwt() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("Authorization")
 		// 没有token
 		if tokenHeader == "" {
-			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-				"code": -1,
-				"msg":  "token is null",
-			})
+			common.ErrReply(ctx, 1005)
+			ctx.Abort()
 			return
 		}
 		// 解析token格式
 		tokenString := strings.SplitN(tokenHeader, " ", 2)
 		if len(tokenString) < 2 || tokenString[0] != "Bearer" {
-			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-				"code": "-1",
-				"msg":  "token format error",
-			})
+			common.ErrReply(ctx, 1008)
+			ctx.Abort()
 			return
 		}
 		// 解析token
-		claims, err := ParseToken(tokenString[1])
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-				"code": -1,
-				"msg":  err.Error(),
-			})
+		claims, code := ParseToken(tokenString[1])
+		if code != 0 {
+			common.ErrReply(ctx, code)
+			ctx.Abort()
 			return
 		}
 		// 判断token是否过期
 		if claims.ExpiresAt < time.Now().Unix() {
-			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-				"code": -1,
-				"msg":  "token is expire",
-			})
+			common.ErrReply(ctx, 1007)
+			ctx.Abort()
 			return
 		}
 		// 判断token是否需要刷新
 		if claims.ExpiresAt < time.Now().Add(time.Hour*TOKEN_FLUSH).Unix() {
-			token, err := GenerateToken(claims.Id)
+			token, code := GenerateToken(claims.Id)
 			// 成功了才刷新token
-			if err == nil {
+			if code == 0 {
 				ctx.Header("Authorization", "Bearer "+token)
 			}
 		}

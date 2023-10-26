@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	"go_chat/common"
 	"go_chat/dao"
 	"net/http"
 )
@@ -11,15 +12,15 @@ func FriendList(c *gin.Context) {
 	// 取出jwt中的id
 	value, _ := c.Get("userId")
 	// 获取数据
-	list, err := dao.FriendList(value.(uint))
-	if err != nil {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"code": -1,
-		//	"msg":  err.Error(),
-		//})
-		errReply(c, err.Error())
-		return
-	}
+	list := dao.FriendList(value.(uint))
+	//if err != nil {
+	//	//c.JSON(http.StatusOK, gin.H{
+	//	//	"code": -1,
+	//	//	"msg":  err.Error(),
+	//	//})
+	//	errReply(c, err.Error())
+	//	return
+	//}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
 		"msg":  "ok",
@@ -33,22 +34,22 @@ func AddFriend(c *gin.Context) {
 	value, _ := c.Get("userId")
 	name := c.PostForm("name")
 	if name == "" {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"code": -1,
-		//	"msg":  "userName is null",
-		//})
-		errReply(c, "userName is null")
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "用户名不能为空",
+		})
+		//errReply(c, "userName is null")
 		return
 	}
-	_, err := dao.AddFriendByName(value.(uint), name)
-	if err != nil {
+	code := dao.AddFriendByName(value.(uint), name)
+	if code != 0 {
 		//c.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(c, err.Error())
+		common.ErrReply(c, code)
 		return
 	}
-	okReply(c)
+	common.OkReply(c)
 
 }

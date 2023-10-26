@@ -1,10 +1,8 @@
 package models
 
-import "gorm.io/gorm"
-
 // Relation 关系结构体
 type Relation struct {
-	gorm.Model
+	Model
 	OwnerId  uint   // 谁的关系信息
 	TargetId uint   // 与谁的关系
 	Type     uint   // 关系类型 1.朋友 2.群组

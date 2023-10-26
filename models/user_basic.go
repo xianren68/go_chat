@@ -2,15 +2,14 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
 // UserBasic 用户结构体
 type UserBasic struct {
-	gorm.Model    // 包含唯一id，更新/删除时间等
+	Model         // 包含唯一id，更新/删除时间等
 	Name          string
-	PassWord      string
+	PassWord      string `json:"-"`
 	Avatar        string
 	Gender        string `gorm:"column:gender;default:male;type:varchar(6)"`
 	Phone         string `valid:"matches(^1[3-9]{1}\\d{9}$)"`

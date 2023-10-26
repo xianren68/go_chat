@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"go_chat/common"
 	"go_chat/dao"
 	"go_chat/models"
 	"net/http"
@@ -13,48 +14,45 @@ func NewGroup(c *gin.Context) {
 	value, _ := c.Get("userId")
 	group := &models.Community{}
 	err := c.BindJSON(group)
-	// 群名为空
-	if group.Name == "" {
-		//c.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "group name cannot be empty",
-		//})
-		errReply(c, "group name cannot be empty")
-		return
-	}
-
-	group.OwnerId = value.(uint)
 	if err != nil {
 		zap.S().Warn("failed to read arguments ", err)
-		//c.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "failed to read arguments",
-		//})
-		errReply(c, "failed to read arguments")
+		c.JSON(200, gin.H{
+			"code": -1,
+			"msg":  "请求参数错误",
+		})
 		return
 	}
-	err = dao.CreateCommunity(group)
-	if err != nil {
+	// 群名为空
+	if group.Name == "" {
+		c.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "群名不能为空",
+		})
+		return
+	}
+	group.OwnerId = value.(uint)
+	code := dao.CreateCommunity(group)
+	if code != 0 {
 		//c.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(c, err.Error())
+		common.ErrReply(c, code)
 		return
 	}
-	okReply(c)
+	common.OkReply(c)
 }
 
 // GetGroupList 获取群列表
 func GetGroupList(c *gin.Context) {
 	value, _ := c.Get("userId")
-	group, err := dao.GetCommunities(value.(uint))
-	if err != nil {
+	group, code := dao.GetCommunities(value.(uint))
+	if code != 0 {
 		//c.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(c, err.Error())
+		common.ErrReply(c, code)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -69,21 +67,20 @@ func JoinGroup(c *gin.Context) {
 	value, _ := c.Get("userId")
 	name := c.PostForm("groupName")
 	if name == "" {
-		//c.JSON(200, gin.H{
-		//	"code": -1,
-		//	"msg":  "group name cannot be empty",
-		//})
-		errReply(c, "group name cannot be empty")
+		c.JSON(200, gin.H{
+			"code": -1,
+			"msg":  "群名称不能为空",
+		})
 		return
 	}
-	err := dao.JoinCommunity(value.(uint), name)
-	if err != nil {
+	code := dao.JoinCommunity(value.(uint), name)
+	if code != 0 {
 		//c.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
 		//	"msg":  err.Error(),
 		//})
-		errReply(c, err.Error())
+		common.ErrReply(c, code)
 		return
 	}
-	okReply(c)
+	common.OkReply(c)
 }

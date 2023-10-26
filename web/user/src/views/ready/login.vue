@@ -41,6 +41,7 @@
 import {ref} from 'vue'
 import {login} from "../../api";
 import {useRouter} from "vue-router";
+import {ElMessage} from "element-plus"
 const router = useRouter()
 const name = ref("")
 const pwd = ref("")
@@ -77,6 +78,7 @@ const Login = async ()=>{
     return
   }
   // 登录成功
+  ElMessage.success("登录成功")
   router.push('/')
 }
 </script>

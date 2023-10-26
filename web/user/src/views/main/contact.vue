@@ -21,18 +21,11 @@
       <div class="group" :class="{select:!switchCt}" @click="switchGroup">群组</div>
     </div>
     <!--    列表-->
-    <div class="list" v-if="switchCt">
-      <div v-for="item in contactPerson" :key="item.ID" class="item-list">
-        <span>{{item.Name}}</span>
-      </div>
-    </div>
-      <div class="list" v-if="!switchCt" >
-        <div v-for="item in contactPerson" class="item-list">
-          <span>{{item.Name}}</span>
-        </div>
-      </div>
+    <List :switchCt="switchCt" v-model="selectIndex"></List>
   </div>
-    <div class="right"></div>
+    <div class="right">
+      <UserInfo v-if="selectIndex >=0" :information="contactPerson[selectIndex]"></UserInfo>
+    </div>
   </div>
 </template>
 
@@ -40,10 +33,14 @@
 import { ref} from 'vue'
 import {useContactStore} from "../../store"
 import {onBeforeMount} from "vue"
+import List from '@/components/contact/list.vue'
+import UserInfo from "@/components/contact/userInfo.vue";
 // 控制搜索框是否显示
 const isShow = ref(false)
 // 控制选择好友还是群组
 const switchCt = ref(true)
+// 选中的好友
+const selectIndex = ref(-1)
 // 渲染列表
 const {contactPerson,getFriendList} = useContactStore()
 // 切换到用户列表
@@ -139,25 +136,6 @@ onBeforeMount(()=>{
         border-bottom: #008efe 2px solid;
       }
 
-    }
-    .list{
-      margin-top: 20px;
-      padding:5px;
-      display: flex;
-      height: 448px;
-      overflow: scroll;
-      flex-direction: column;
-      align-items: center;
-      .item-list{
-        height: 50px;
-        width: 100%;
-        background: linear-gradient(to right, #654ea3, #eaafc8);
-        border-radius: 10px;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-      }
-    }
-    .list::-webkit-scrollbar{
-      display: none;
     }
   }
   .right {

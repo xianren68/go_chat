@@ -23,7 +23,7 @@ import asideVue from '../components/aside.vue';
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #fff;
+          background: linear-gradient(to right, #093028, #237a57);
         }
         main{
           padding: 20px;

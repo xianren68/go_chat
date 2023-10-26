@@ -3,12 +3,12 @@
         <div class="avatar">
             <img src="../assets/img/avatar.jpg" alt="">
         </div>
-        <a class="item" @click="message">
+        <a class="item" @click="message" :class="{select:route.currentRoute.value.name == 'message'}">
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>
         </a>
-        <a class="item" @click="contact">
+        <a class="item" @click="contact" :class="{select:route.currentRoute.value.name == 'contact'}">
             <svg class="icon">
                 <use xlink:href="#icon-contact"></use>
             </svg>
@@ -22,38 +22,21 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from "vue-router";
+import {useRouter} from "vue-router"
+import {useRoute} from "vue-router"
+
 const router = useRouter()
-// 被选中的项
-let active: HTMLElement
+const route = useRouter()
 // 跳转到消息页
 const message = (e:Event)=>{
-    animation(e.currentTarget as HTMLElement)
 }
 // 跳转到联系人页
 const contact = (e:Event)=>{
-    animation(e.currentTarget as HTMLElement)
   router.push('contact')
 
 }
 // 跳转到设置页
 const setting = (e:Event)=>{
-    animation(e.currentTarget as HTMLElement)
-}
-// 点击选项动画
-const animation = (e: HTMLElement) => {
-    
-    // 重复点击
-    if (active == e) {
-        return
-    }
-    // 有被选中的
-    if (active != undefined) {
-        active.classList.remove('select')
-    }
-    // 添加样式
-    active = e
-    active.classList.add('select')
 }
 </script>
 

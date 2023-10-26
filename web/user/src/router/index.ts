@@ -19,7 +19,7 @@ const routes = [
         component:()=>import('../views/ready.vue'),
         children:[
             {
-                path:'',
+                path:'/',
                 name:'login',
                 component:()=>import('../views/ready/login.vue')
             }
@@ -33,8 +33,8 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to)=>{
     let token = localStorage.getItem("token")
-    if(!token && to.name != 'ready'){
-        return {name:'ready'}
+    if(!token && to.name != 'login'){
+        return {name:'login'}
     }
 })
 export default router

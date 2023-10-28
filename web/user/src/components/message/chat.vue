@@ -38,7 +38,7 @@
     flex-direction: column;
 
     .top {
-        height: 8%;
+        height: 49px;
         display: flex;
         border-bottom: #ccc 1px solid;
         justify-content: center;

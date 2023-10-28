@@ -13,8 +13,9 @@ type UserBasic struct {
 	Avatar        string
 	Gender        string `gorm:"column:gender;default:male;type:varchar(6)"`
 	Phone         string `valid:"matches(^1[3-9]{1}\\d{9}$)"`
-	Email         string `valid:"email"`
-	Identity      string
+	Line          string
+	Email         string     `valid:"email"`
+	Identity      string     `json:"-"`
 	ClientIp      string     `valid:"ipv4" json:"-"`
 	ClientPort    string     `json:"-"`
 	Salt          string     `json:"-"` // 加密盐值

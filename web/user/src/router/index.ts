@@ -1,40 +1,49 @@
-import { createRouter,createWebHistory } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 
 const routes = [
     {
-        path:'/',
-        name:'main',
+        path: '/',
+        name: 'main',
         // 懒加载
-        component:()=>import('../views/main.vue'),
-        children:[{
-            name:'contact',
-            path:'contact',
-            component:()=>import('../views/main/contact.vue')
-        }]
+        component: () => import('@/views/main.vue'),
+        children:
+            [
+                {
+                    name: 'contact',
+                    path: 'contact',
+                    component: () => import('@/views/main/contact.vue')
+                },
+                {
+                    name: 'message',
+                    path: 'message',
+                    component: () => import('@/views/main/message.vue')
+                }
+            ]
 
     },
     {
-        path:'/ready',
-        name:'ready',
-        component:()=>import('../views/ready.vue'),
-        children:[
+        path: '/ready',
+        name: 'ready',
+        component: () => import('@/views/ready.vue'),
+        children: [
             {
-                path:'/',
-                name:'login',
-                component:()=>import('../views/ready/login.vue')
+                path: '/',
+                name: 'login',
+                component: () => import('@/views/ready/login.vue')
             }
         ]
     }
 ]
 const router = createRouter({
     routes,
-    history:createWebHistory()
+    history: createWebHistory()
 })
 // 全局前置守卫
-router.beforeEach((to)=>{
+router.beforeEach((to) => {
     let token = localStorage.getItem("token")
-    if(!token && to.name != 'login'){
-        return {name:'login'}
+    if (!token && to.name != 'login') {
+        return {name: 'login'}
     }
 })
+
 export default router

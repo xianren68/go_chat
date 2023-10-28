@@ -62,7 +62,7 @@ onBeforeMount(()=>{
   display: flex;
   align-items: center;
   height: 100%;
-  width: 100%;
+  flex-grow:1;
   .left{
     height: 100%;
     width: 20%;

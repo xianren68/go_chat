@@ -1,15 +1,7 @@
 import {defineStore} from "pinia"
 import {getPersonList} from "../api"
 import {reactive} from "vue";
-interface userInt {
-    Name:string,
-    ID:number,
-    Avatar:string,
-    Phone:string,
-    Email:string,
-    Gender:string,
-    Line:string
-}
+import {userInt} from "@/type";
 // 联系人/群组列表
 const contactStore = defineStore('contact',()=>{
     // 联系人列表

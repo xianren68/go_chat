@@ -28,7 +28,6 @@ const contactPerson = useContactStore().contactPerson
 <style scoped lang="scss">
 .list{
   margin-top: 20px;
-  padding:5px;
   display: flex;
   height: 448px;
   overflow: scroll;
@@ -36,7 +35,7 @@ const contactPerson = useContactStore().contactPerson
   align-items: center;
   .item-list{
     height: 50px;
-    width: 94%;
+    width: 90%;
     display: flex;
     padding:0 5px;
     margin-top: 10px;

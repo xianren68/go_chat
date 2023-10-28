@@ -18,7 +18,7 @@
                 <span>{{information.Email == ""?"未绑定手机号":information.Email}}</span>
               </div>
             <div class="connect">
-              <svg class="icon">
+              <svg class="icon" @click="jumpMsg(information.ID,information.Name,information.Avatar)">
                 <use xlink:href="#icon-faxiaoxi"></use>
               </svg>
               <svg class="icon">
@@ -37,7 +37,14 @@
     </div>
 </template>
 <script setup lang="ts">
+import {useRouter} from 'vue-router'
+// 路由
+const router = useRouter()
 defineProps(['information'])
+// 跳转到聊天页面
+const jumpMsg = (ID:number,Name:string,Avatar:string)=>{
+  router.push({name:'message',query:{ID,Name,Avatar}})
+}
 </script>
 
 <style scoped lang="scss">

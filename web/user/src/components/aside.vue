@@ -3,12 +3,12 @@
         <div class="avatar">
             <img src="../assets/img/avatar.jpg" alt="">
         </div>
-        <a class="item" @click="message" :class="{select:route.currentRoute.value.name == 'message'}">
+        <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'message'}">
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>
         </a>
-        <a class="item" @click="contact" :class="{select:route.currentRoute.value.name == 'contact'}">
+        <a class="item" @click="contact" :class="{select:router.currentRoute.value.name == 'contact'}">
             <svg class="icon">
                 <use xlink:href="#icon-contact"></use>
             </svg>
@@ -23,10 +23,8 @@
 
 <script setup lang="ts">
 import {useRouter} from "vue-router"
-import {useRoute} from "vue-router"
 
 const router = useRouter()
-const route = useRouter()
 // 跳转到消息页
 const message = (e:Event)=>{
 }

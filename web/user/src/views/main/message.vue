@@ -1,5 +1,6 @@
 <template>
     <div class="message">
+        <!--聊天用户列表-->
         <div class="list">
             <div class="item" v-for="(msg,i) in msgList" :key="i" :class="{select:show && i== 0}">
                 <div class="img">
@@ -14,7 +15,7 @@
             </div>
         </div>
         <div class="msg">
-
+            <chat></chat>
         </div>
     </div>
 </template>
@@ -24,6 +25,7 @@ import {useMsgStore} from "@/store"
 import {onBeforeMount,ref} from "vue"
 import {messageInt} from "@/type"
 import {useRoute} from "vue-router"
+import chat from "@/components/message/chat.vue"
 
 const {msgList, updateMsgList} = useMsgStore()
 
@@ -43,11 +45,10 @@ onBeforeMount(() => {
 <style lang="scss" scoped>
 .message {
     height: 100%;
-    width: 100%;
+    flex-grow: 1;
     display: flex;
 
     .list {
-        margin-top: 20px;
         display: flex;
         height: 100%;
         width: 20%;
@@ -56,15 +57,14 @@ onBeforeMount(() => {
         align-items: center;
 
         .item {
+        box-sizing: border-box;
             height: 50px;
-            width: 90%;
+            width: 100%;
             display: flex;
-            padding: 0 5px;
-            margin-top: 10px;
+            padding: 0 3px;
             align-items: center;
-            background: linear-gradient(to right, #d3cce3, #e9e4f0);
-            border-radius: 10px;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            border-bottom:1px solid #eee ;
+            background-color:#f9f9fb;
 
             .img {
                 height: 35px;
@@ -96,9 +96,8 @@ onBeforeMount(() => {
         }
 
         .item.select {
-            background: linear-gradient(to right, #bdc3c7, #2c3e50);
-            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-            transition: .5s;
+                background: linear-gradient(to right, #f9d9da, #fff,#fff);
+                transition: .5s;
         }
     }
 
@@ -110,6 +109,10 @@ onBeforeMount(() => {
 
     .list::-webkit-scrollbar {
         display: none;
+    }
+    .msg {
+        height:100%;
+        flex-grow:1;
     }
 }
 </style>

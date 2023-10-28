@@ -34,15 +34,14 @@ const contactPerson = useContactStore().contactPerson
   flex-direction: column;
   align-items: center;
   .item-list{
+    box-sizing: border-box;
     height: 50px;
-    width: 90%;
+    width: 100%;
     display: flex;
-    padding:0 5px;
-    margin-top: 10px;
+    padding:0 10px;
     align-items: center;
-    background: linear-gradient(to right, #d3cce3, #e9e4f0);
-    border-radius: 10px;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-bottom:1px solid #eee ;
+    background-color:#f9f9fb;
     .img{
       height:35px;
       width: 35px;
@@ -58,7 +57,7 @@ const contactPerson = useContactStore().contactPerson
       margin-left: 10px;
       .name{
         font-size: 14px;
-        font-weight: bold;
+        font-weight: normal;
         margin-bottom: 3px;
       }
       .line{
@@ -68,8 +67,7 @@ const contactPerson = useContactStore().contactPerson
     }
   }
   .item-list.select{
-    background: linear-gradient(to right, #bdc3c7, #2c3e50);
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    background: linear-gradient(to right, #f9d9da, #fff,#fff);
     transition: .5s;
   }
 }

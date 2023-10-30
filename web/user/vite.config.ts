@@ -12,11 +12,10 @@ export default defineConfig({
     }),
     Components({
       resolvers: [ElementPlusResolver()],
-    }),],
+    })],
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
     }
   }
-
 })

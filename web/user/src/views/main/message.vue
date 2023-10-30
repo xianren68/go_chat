@@ -14,8 +14,8 @@
                 </div>
             </div>
         </div>
-        <div class="msg">
-            <chat></chat>
+        <div class="msg" v-if="show">
+            <chat  :userInfo="msgList[0]"></chat>
         </div>
     </div>
 </template>

@@ -1,7 +1,11 @@
 <template>
     <div class="chat">
-        <div class="top">hello</div>
-        <div class="main"></div>
+        <div class="top">{{userInfo.Name}}</div>
+        <div class="main">
+            <div v-for="item in msgList">
+                <meMsg :data="item"></meMsg>
+            </div>
+        </div>
         <!--发送消息-->
         <div class="send">
             <div class="send-main">
@@ -9,7 +13,7 @@
                     <svg class="icon">
                         <use xlink:href="#icon-huatong"></use>
                     </svg>
-                    <input>
+                    <input v-model="message">
                     <svg class="icon">
                         <use xlink:href="#icon-biaoqing"></use>
                     </svg>
@@ -17,7 +21,7 @@
                         <use xlink:href="#icon-attachment"></use>
                     </svg>
                 </div>
-                <div class="send-icon">
+                <div class="send-icon" @click="sendMsg">
                     <svg class="icon">
                         <use xlink:href="#icon-send"></use>
                     </svg>
@@ -28,6 +32,21 @@
 </template>
 
 <script setup lang="ts">
+import { ref,reactive } from "vue"
+import socket from "../../api/socket"
+import meMsg from "./meMsg.vue";
+// 获取当前聊天人的信息
+const props = defineProps(["userInfo"])
+// 消息数据
+const message = ref("")
+// 消息列表
+const msgList = reactive([])
+// 发送消息
+const sendMsg = () => {
+    socket.s?.send(JSON.stringify({targetId:props.userInfo.id,type:1,content:message.value}))
+    msgList.push({avatar:"",msg:message.value})
+    message.value = ""
+}
 </script>
 
 <style scoped lang="scss">
@@ -48,6 +67,8 @@
 
     .main {
         height: 80%;
+        padding:0 10px;
+        padding-top: 20px;
         overflow: scroll;
     }
 

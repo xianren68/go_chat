@@ -9,7 +9,14 @@
 </template>
 
 <script lang="ts" setup>
-import asideVue from '../components/aside.vue';
+import asideVue from '../components/aside.vue'
+import socket from '@/api/socket'
+import { onMounted } from 'vue'
+
+onMounted(()=>{
+  // 建立socket链接
+  socket.init()
+})
 
 </script>
 

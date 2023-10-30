@@ -1,9 +1,9 @@
 import axios from "axios"
 import NProgressE from 'nprogresse'
 import 'nprogresse/style.css'
-import {useRouter} from "vue-router";
+import router from '@/router'
 import { ElMessage } from 'element-plus'
-const router = useRouter()
+//const router = useRouter()
 const req = axios.create({
     baseURL:"http://127.0.0.1:8080/v1",
     timeout:5000,
@@ -28,8 +28,8 @@ req.interceptors.response.use(function (config) {
     let code = config.data.code
     // token错误(跳转到登录页)
     if(code >= 1005 && code <= 1008){
-        ElMessage.error("登录状态过期，即将跳转到登录页")
-        router.push('login')
+        ElMessage({message:'登录过期，即将返回登录页',type:'error'})
+        router.push({name:'login'})
     }
     // 判断响应头中是否存在token
     let token = config.headers['authorization']?.split(" ")[1]

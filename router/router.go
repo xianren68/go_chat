@@ -14,6 +14,7 @@ func Router() *gin.Engine {
 	r.Use(middleware.Cors())
 	// v1版本
 	v1 := r.Group("v1")
+	v1.GET("/chat", service.SendUserMsg)
 	v1.POST("/login", service.Login)
 	v1.POST("/new", service.NewUser)
 	// 鉴权
@@ -25,7 +26,6 @@ func Router() *gin.Engine {
 		user.GET("/list", service.List)
 		user.DELETE("/delete", service.DeleteUser)
 		user.PUT("/update", service.UpdateUser)
-		user.GET("/sendmsg", service.SendUserMsg)
 	}
 	// 关系相关
 	relation := auth.Group("relation")

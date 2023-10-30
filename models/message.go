@@ -2,10 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"net"
+	"go_chat/common"
+	"go_chat/middleware"
 	"net/http"
 	"sync"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -41,20 +42,33 @@ var rwLocker sync.RWMutex
 
 // Chat 升级连接，初始化node
 func Chat(c *gin.Context) {
-	// 获取用户id
-	userId, _ := c.Get("userId")
-	Id := userId.(uint)
+	// 获取token
+	token := c.Request.Header.Get("Sec-WebSocket-Protocol")
+	if token == "" {
+		common.ErrReply(c, 1005)
+		c.Abort()
+		return
+	}
+	// 解析token
+	claims, code := middleware.ParseToken(token)
+	if code != 0 {
+		common.ErrReply(c, code)
+		c.Abort()
+		return
+	}
+	// 获取id
+	Id := claims.Id
 	// 将连接升级为socket
 	conn, err := (&websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
+		Subprotocols: []string{c.Request.Header.Get("Sec-Websocket-Protocol")},
 	}).Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		zap.S().Warn(err)
 		return
 	}
-
 	// 获取socket连接，建立消息节点
 	node := &Node{
 		Conn:      conn,
@@ -74,89 +88,97 @@ func Chat(c *gin.Context) {
 
 // 发送消息
 func sendProc(node *Node) {
-	for data := range node.Data {
-		err := node.Conn.WriteMessage(websocket.TextMessage, data)
-		if err != nil {
-			zap.S().Info("failed to send message")
-			return
+	for {
+		select {
+		case data := <-node.Data:
+			err := node.Conn.WriteMessage(websocket.TextMessage, data)
+			if err != nil {
+				zap.S().Info("failed to send message")
+				return
+			}
 		}
 	}
 }
 
-// 全局channel
-var upSendMsg = make(chan []byte, 1024)
+//// 全局channel
+//var upSendMsg = make(chan []byte, 1024)
 
 // （接收客户端要发送的消息）
 func recProc(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
 		if err != nil {
-			zap.S().Info("failed to read message")
+			zap.S().Info("failed to read message",err)
 			return
 		}
-		// 将消息写入全局channel
-		brodMsg(data)
-	}
-}
-
-// 将消息写入全局channel
-func brodMsg(data []byte) {
-	upSendMsg <- data
-}
-
-func init() {
-	go udpRecProc()
-	go udpSendProc()
-}
-
-// 将消息写入udp服务器
-func udpSendProc() {
-	uC, err := net.DialUDP("udp", nil, &net.UDPAddr{
-		IP:   net.IPv4(127, 0, 0, 1),
-		Port: 5000,
-		Zone: "",
-	})
-	if err != nil {
-		zap.S().Info("failed to connect udp")
-		panic("failed to connect udp")
-	}
-	defer uC.Close()
-	for bytes := range upSendMsg {
-		_, err = uC.Write(bytes)
-		if err != nil {
-			zap.S().Info("failed to write udp")
-			continue
-		}
-	}
-}
-
-// 开启udp服务
-func udpRecProc() {
-	uC, err := net.ListenUDP("udp", &net.UDPAddr{
-		IP:   net.IPv4(127, 0, 0, 1),
-		Port: 5000,
-		Zone: "",
-	})
-	if err != nil {
-		zap.S().Info("failed to listen upd")
-		panic("failed to listen upd")
-	}
-	// 获取客户端数据
-	for {
-		var buf = [1024]byte{}
-		var n int
-		n, err = uC.Read(buf[:])
-		if err != nil {
-			zap.S().Info("failed to get message")
-			// 略过消息，继续下一条
-			continue
-		}
+		//// 将消息写入全局channel
+		//brodMsg(data)
 		// 解析消息
-		disPatch(buf[:n])
+		disPatch(data)
+
 	}
 }
 
-// 解析聊天
+//// 将消息写入全局channel
+//func brodMsg(data []byte) {
+//	upSendMsg <- data
+//}
+
+//	func init() {
+//		go udpRecProc()
+//		go udpSendProc()
+//	}
+//
+// // 将消息写入udp服务器
+//
+//	func udpSendProc() {
+//		uC, err := net.DialUDP("udp", nil, &net.UDPAddr{
+//			IP:   net.IPv4(127, 0, 0, 1),
+//			Port: 5000,
+//			Zone: "",
+//		})
+//		if err != nil {
+//			zap.S().Info("failed to connect udp")
+//			panic("failed to connect udp")
+//		}
+//		defer uC.Close()
+//		for bytes := range upSendMsg {
+//			_, err = uC.Write(bytes)
+//			if err != nil {
+//				zap.S().Info("failed to write udp")
+//				continue
+//			}
+//		}
+//	}
+//
+// // 开启udp服务
+//
+//	func udpRecProc() {
+//		uC, err := net.ListenUDP("udp", &net.UDPAddr{
+//			IP:   net.IPv4(127, 0, 0, 1),
+//			Port: 5000,
+//			Zone: "",
+//		})
+//		if err != nil {
+//			zap.S().Info("failed to listen upd")
+//			panic("failed to listen upd")
+//		}
+//		// 获取客户端数据
+//		for {
+//			var buf = [1024]byte{}
+//			var n int
+//			n, err = uC.Read(buf[:])
+//			if err != nil {
+//				zap.S().Info("failed to get message")
+//				// 略过消息，继续下一条
+//				continue
+//			}
+//			// 解析消息
+//			disPatch(buf[:n])
+//		}
+//	}
+//
+// // 解析聊天
 func disPatch(data []byte) {
 	// 解析消息
 	msg := &Message{}
@@ -165,6 +187,7 @@ func disPatch(data []byte) {
 		zap.S().Info("failed to parse message")
 		return
 	}
+	fmt.Println(msg)
 	// 判断聊天类型
 	switch msg.Type {
 	// 私聊

@@ -12,6 +12,8 @@ func main() {
 	initialize.InitConfig()
 	// 初始化数据库
 	initialize.InitDB()
+	// 初始化redis
+	initialize.InitRedis()
 	// 启动端口监听
 	r := router.Router()
 	err := r.Run(":8080")

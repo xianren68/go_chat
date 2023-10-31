@@ -1,29 +1,27 @@
 package models
 
 import (
+	"context"
 	"encoding/json"
-	"go_chat/common"
-	"go_chat/middleware"
-	"net/http"
-	"sync"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
+	"go_chat/common"
+	"go_chat/global"
+	"go_chat/middleware"
 	"gopkg.in/fatih/set.v0"
+	"net/http"
+	"strconv"
+	"sync"
 )
 
 // Message 消息结构体(表)
 type Message struct {
-	Model
 	FormId   uint   // 发送者id
 	TargetId uint   // 接收者id
+	groupId  uint   // 群聊id
 	Type     int    // 发送消息类型 （群发，私聊）
-	Media    int    // 消息类型 （文字，图片，音频）
-	Pic      string `json:"url"` // 图片相关
-	Url      string // 文件相关
 	Content  string // 消息内容
-	Desc     string // 文件描述
 }
 
 // Node 构造连接
@@ -45,7 +43,10 @@ func Chat(c *gin.Context) {
 	// 获取token
 	token := c.Request.Header.Get("Sec-WebSocket-Protocol")
 	if token == "" {
-		common.ErrReply(c, 1005)
+		common.ErrReply(
+			c,
+			1005,
+		)
 		c.Abort()
 		return
 	}
@@ -100,85 +101,20 @@ func sendProc(node *Node) {
 	}
 }
 
-//// 全局channel
-//var upSendMsg = make(chan []byte, 1024)
-
 // （接收客户端要发送的消息）
 func recProc(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
 		if err != nil {
-			zap.S().Info("failed to read message",err)
+			zap.S().Info("failed to read message", err)
 			return
 		}
-		//// 将消息写入全局channel
-		//brodMsg(data)
-		// 解析消息
 		disPatch(data)
 
 	}
 }
 
-//// 将消息写入全局channel
-//func brodMsg(data []byte) {
-//	upSendMsg <- data
-//}
-
-//	func init() {
-//		go udpRecProc()
-//		go udpSendProc()
-//	}
-//
-// // 将消息写入udp服务器
-//
-//	func udpSendProc() {
-//		uC, err := net.DialUDP("udp", nil, &net.UDPAddr{
-//			IP:   net.IPv4(127, 0, 0, 1),
-//			Port: 5000,
-//			Zone: "",
-//		})
-//		if err != nil {
-//			zap.S().Info("failed to connect udp")
-//			panic("failed to connect udp")
-//		}
-//		defer uC.Close()
-//		for bytes := range upSendMsg {
-//			_, err = uC.Write(bytes)
-//			if err != nil {
-//				zap.S().Info("failed to write udp")
-//				continue
-//			}
-//		}
-//	}
-//
-// // 开启udp服务
-//
-//	func udpRecProc() {
-//		uC, err := net.ListenUDP("udp", &net.UDPAddr{
-//			IP:   net.IPv4(127, 0, 0, 1),
-//			Port: 5000,
-//			Zone: "",
-//		})
-//		if err != nil {
-//			zap.S().Info("failed to listen upd")
-//			panic("failed to listen upd")
-//		}
-//		// 获取客户端数据
-//		for {
-//			var buf = [1024]byte{}
-//			var n int
-//			n, err = uC.Read(buf[:])
-//			if err != nil {
-//				zap.S().Info("failed to get message")
-//				// 略过消息，继续下一条
-//				continue
-//			}
-//			// 解析消息
-//			disPatch(buf[:n])
-//		}
-//	}
-//
-// // 解析聊天
+// 解析聊天
 func disPatch(data []byte) {
 	// 解析消息
 	msg := &Message{}
@@ -187,14 +123,16 @@ func disPatch(data []byte) {
 		zap.S().Info("failed to parse message")
 		return
 	}
-	fmt.Println(msg)
 	// 判断聊天类型
 	switch msg.Type {
 	// 私聊
 	case 1:
 		sendMsgAndSave(msg.TargetId, data)
+		// 群聊
 	case 2:
 		// sendGroup(msg.FormId, msg.TargetId)
+	case 3:
+		// 请求添加好友
 	}
 
 }
@@ -202,9 +140,18 @@ func sendMsgAndSave(id uint, msg []byte) {
 	rwLocker.Lock()
 	node, ok := clientMap[id]
 	rwLocker.Unlock()
+	// 用户不在线，存进redis缓存中
 	if !ok {
+		saveRedis(id, msg)
 		zap.S().Info("user is not online")
 		return
 	}
 	node.Data <- msg
+}
+
+func saveRedis(id uint, msg []byte) {
+	ctx := context.Background()
+	key := "list" + strconv.Itoa(int(id))
+	_, _ = global.RedisDB.LPush(ctx, key, string(msg)).Result()
+
 }

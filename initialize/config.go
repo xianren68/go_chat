@@ -17,6 +17,7 @@ func InitConfig() {
 	serviceCfg := &config.ServiceConfig{}
 	serviceCfg.Port = cfg.Section("").Key("port").String()
 	serviceCfg.Mysql = initMysql(cfg)
+	serviceCfg.Redis = initRedis(cfg)
 	global.ServiceConfig = serviceCfg
 }
 
@@ -29,4 +30,12 @@ func initMysql(cfg *ini.File) *config.MysqlConfig {
 	mysqlConfig.Port = cfg.Section("mysql").Key("port").String()
 	mysqlConfig.DbName = cfg.Section("mysql").Key("dbname").String()
 	return mysqlConfig
+}
+
+// 初始化redis配置
+func initRedis(cfg *ini.File) *config.RedisConfig {
+	redisConfig := &config.RedisConfig{}
+	redisConfig.Host = cfg.Section("redis").Key("host").String()
+	redisConfig.Port = cfg.Section("redis").Key("port").String()
+	return redisConfig
 }

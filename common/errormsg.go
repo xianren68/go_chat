@@ -58,7 +58,10 @@ func OkReply(ctx *gin.Context) {
 }
 
 // ErrReply 失败回复
-func ErrReply(ctx *gin.Context, code int) {
+func ErrReply(
+	ctx *gin.Context,
+	code int,
+) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  GetMsg(code),

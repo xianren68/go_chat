@@ -17,9 +17,9 @@ import (
 
 // Message 消息结构体(表)
 type Message struct {
-	FormId   uint   // 发送者id
-	TargetId uint   // 接收者id
-	groupId  uint   // 群聊id
+	FromId   uint   `json:"from_id"`   // 发送者id
+	TargetId uint   `json:"target_id"` // 接收者id
+	groupId  uint   `json:"group_id"`  // 群聊id
 	Type     int    // 发送消息类型 （群发，私聊）
 	Content  string // 消息内容
 }
@@ -119,10 +119,12 @@ func disPatch(data []byte) {
 	// 解析消息
 	msg := &Message{}
 	err := json.Unmarshal(data, msg)
+
 	if err != nil {
-		zap.S().Info("failed to parse message")
+		zap.S().Info("failed to parse message", err)
 		return
 	}
+
 	// 判断聊天类型
 	switch msg.Type {
 	// 私聊

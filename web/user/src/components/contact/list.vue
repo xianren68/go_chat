@@ -1,6 +1,6 @@
 <template>
-  <div class="list" v-if="switchCt">
-    <div v-for="(item,i) in contactPerson" :key="i" class="item-list" @click="$emit('update:modelValue',i)" :class="{select:i==modelValue}">
+  <div class="list">
+    <div v-for="(item,i) in List" :key="i" class="item-list" @click="$emit('update:modelValue',i)" :class="{select:i==modelValue}">
       <div class="img">
         <img :src="item.Avatar == ''?'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU':item.Avatar" alt="">
       </div>
@@ -10,20 +10,11 @@
       </div>
     </div>
   </div>
-  <div class="list" v-if="!switchCt" >
-    <div v-for="item in contactPerson" class="item-list">
-      <span>{{item.Name}}</span>
-    </div>
-  </div>
 </template>
 <script setup lang="ts">
 import {useContactStore} from "@/store"
-defineProps({
-  switchCt:Boolean,
-  modelValue:Number,
-})
+defineProps(['List','modelValue'])
 defineEmits()
-const contactPerson = useContactStore().contactPerson
 </script>
 <style scoped lang="scss">
 .list{

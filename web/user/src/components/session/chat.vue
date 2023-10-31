@@ -1,6 +1,6 @@
 <template>
     <div class="chat">
-        <div class="top">{{userInfo.Name}}</div>
+        <div class="top">{{sessionInfo.Name}}</div>
         <div class="main">
             <div v-for="item in msgList">
                 <meMsg :data="item"></meMsg>
@@ -36,14 +36,17 @@ import { ref,reactive } from "vue"
 import socket from "../../api/socket"
 import meMsg from "./meMsg.vue";
 // 获取当前聊天人的信息
-const props = defineProps(["userInfo"])
+const props = defineProps(["sessionInfo"])
 // 消息数据
 const message = ref("")
 // 消息列表
 const msgList = reactive([])
 // 发送消息
 const sendMsg = () => {
-    socket.s?.send(JSON.stringify({targetId:props.userInfo.id,type:1,content:message.value}))
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") as string)
+    console.log(userInfo.id);
+    
+    socket.s?.send(JSON.stringify({from_id:userInfo.ID,target_id:props.sessionInfo.ID,type:1,content:message.value}))
     msgList.push({avatar:"",msg:message.value})
     message.value = ""
 }

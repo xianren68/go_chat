@@ -74,9 +74,11 @@ const Login = async ()=>{
   }
   const {data} = await login({name:name.value,password:pwd.value})
   if(data.code == -1){
-    alert(data.msg)
+    ElMessage.error(data.msg)
     return
   }
+  localStorage.setItem("userInfo",JSON.stringify(data.userInfo))
+
   // 登录成功
   ElMessage.success("登录成功")
   router.push('/')

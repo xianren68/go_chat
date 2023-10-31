@@ -10,12 +10,17 @@
 
 <script lang="ts" setup>
 import asideVue from '../components/aside.vue'
+import { getUnreadMsg } from '../api'
 import socket from '@/api/socket'
 import { onMounted } from 'vue'
 
-onMounted(()=>{
+onMounted(async ()=>{
   // 建立socket链接
   socket.init()
+  // 获取未读消息
+  const {data} = await getUnreadMsg()
+  console.log(data)
+  
 })
 
 </script>

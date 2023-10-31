@@ -8,9 +8,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Aside: typeof import('./src/components/aside.vue')['default']
-    Chat: typeof import('./src/components/message/chat.vue')['default']
+    Chat: typeof import('./src/components/session/chat.vue')['default']
     List: typeof import('./src/components/contact/list.vue')['default']
-    MeMsg: typeof import('./src/components/message/meMsg.vue')['default']
+    MeMsg: typeof import('./src/components/session/meMsg.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UserInfo: typeof import('./src/components/contact/userInfo.vue')['default']

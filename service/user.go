@@ -2,11 +2,13 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go_chat/common"
 	"go_chat/dao"
+	"go_chat/global"
 	"go_chat/middleware"
 	"go_chat/models"
 	"math/rand"
@@ -64,7 +66,10 @@ func Login(ctx *gin.Context) {
 		return
 	}
 	ctx.Header("Authorization", "Bearer "+token)
-	common.OkReply(ctx)
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":     0,
+		"userInfo": user,
+	})
 }
 
 // NewUser 添加用户
@@ -203,4 +208,29 @@ func DeleteUser(ctx *gin.Context) {
 // SendUserMsg 发送消息
 func SendUserMsg(c *gin.Context) {
 	models.Chat(c)
+}
+
+// GetUnread 获取用户未读消息
+func GetUnread(c *gin.Context) {
+	value, _ := c.Get("userId")
+	id := value.(uint)
+	data := getUnreadList(id)
+	fmt.Println(data, id)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"data": data,
+	})
+}
+
+// 获取redis未读消息列表
+func getUnreadList(id uint) []string {
+	ctx := context.Background()
+	key := "list" + strconv.Itoa(int(id))
+	fmt.Println(key)
+	count, _ := global.RedisDB.LLen(ctx, key).Result()
+	result, err := global.RedisDB.LPopCount(ctx, key, int(count)).Result()
+	if err != nil {
+		zap.S().Info(err)
+	}
+	return result
 }

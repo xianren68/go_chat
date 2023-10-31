@@ -8,11 +8,11 @@ export interface userInt {
     Gender:string,
     Line:string
 }
-// 消息类型
-export interface messageInt {
+// 会话类型
+export interface sessionInt {
     ID:number,
     Name:string,
     Avatar:string,
-    // 与这个联系人的最后一条消息
+    // 当前会话的最后一条消息
     lastMsg?:string,
 }

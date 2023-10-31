@@ -2,43 +2,45 @@
     <div class="message">
         <!--聊天用户列表-->
         <div class="list">
-            <div class="item" v-for="(msg,i) in msgList" :key="i" :class="{select:show && i== 0}">
+            <div class="item" v-for="(session,i) in sessionList" :key="i" :class="{select:show && i== 0}">
                 <div class="img">
                     <img
-                        :src="msg.Avatar == ''?'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU':item.Avatar"
+                        :src="session.Avatar == ''?'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU':item.Avatar"
                         alt="">
                 </div>
                 <div class="desc">
-                    <p class="name">{{ msg.Name }}</p>
-                    <p class="line">{{ msg?.lastMsg }}</p>
+                    <p class="name">{{ session.Name }}</p>
+                    <p class="line">{{ session?.lastMsg }}</p>
                 </div>
             </div>
         </div>
         <div class="msg" v-if="show">
-            <chat  :userInfo="msgList[0]"></chat>
+            <chat  :sessionInfo="sessionList[0]"></chat>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {useMsgStore} from "@/store"
+import {useSessionStore} from "@/store"
 import {onBeforeMount,ref} from "vue"
-import {messageInt} from "@/type"
+import {sessionInt} from "@/type"
 import {useRoute} from "vue-router"
-import chat from "@/components/message/chat.vue"
+import chat from "@/components/session/chat.vue"
 
-const {msgList, updateMsgList} = useMsgStore()
+const {sessionList, updateSessionList} = useSessionStore()
 
 const route = useRoute()
 // 是否有选中的聊天
 const show = ref(false)
 // 获取路由参数
 onBeforeMount(() => {
-    const cur = route.query
+    const cur:sessionInt = route.query
+    cur.ID = parseInt(cur.ID)
+    console.log(cur)
     // 没有传参
     if (!cur) return
     show.value = true
-    updateMsgList(cur)
+    updateSessionList(cur)
 })
 </script>
 

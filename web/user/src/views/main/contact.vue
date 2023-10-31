@@ -21,7 +21,7 @@
       <div class="group" :class="{select:!switchCt}" @click="switchGroup">群组</div>
     </div>
     <!--    列表-->
-    <List :switchCt="switchCt" v-model="selectIndex"></List>
+    <List :List="contactPerson" v-model="selectIndex"></List>
   </div>
     <div class="right">
       <UserInfo v-if="selectIndex >=0" :information="contactPerson[selectIndex]"></UserInfo>
@@ -41,7 +41,7 @@ const isShow = ref(false)
 const switchCt = ref(true)
 // 选中的好友
 const selectIndex = ref(-1)
-// 渲染列表
+// 好友
 const {contactPerson,getFriendList} = useContactStore()
 // 切换到用户列表
 const switchFriend = ()=>{

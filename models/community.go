@@ -19,6 +19,6 @@ type Community struct {
 	Name    string // 群名称
 	OwnerId uint   // 群主
 	Type    int    // 群类型
-	Image   string // 头像
-	Desc    string // 描述
+	Avatar  string // 头像
+	Line    string // 描述
 }

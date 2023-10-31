@@ -14,9 +14,9 @@ const routes = [
                     component: () => import('@/views/main/contact.vue')
                 },
                 {
-                    name: 'message',
-                    path: 'message',
-                    component: () => import('@/views/main/message.vue')
+                    name: 'session',
+                    path: 'session',
+                    component: () => import('@/views/main/session.vue')
                 }
             ]
 

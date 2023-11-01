@@ -3,15 +3,17 @@
         <div class="avatar">
             <img src="../assets/img/avatar.jpg" alt="">
         </div>
-        <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'message'}">
+        <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'session'}">
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>
+            <p class="unreadMsg">10</p>
         </a>
         <a class="item" @click="contact" :class="{select:router.currentRoute.value.name == 'contact'}">
             <svg class="icon">
                 <use xlink:href="#icon-contact"></use>
             </svg>
+            <p class="unreadNotice"></p>
         </a>
         <a class="setting" @click="setting">
             <svg class="icon">
@@ -26,15 +28,16 @@ import {useRouter} from "vue-router"
 
 const router = useRouter()
 // 跳转到消息页
-const message = (e:Event)=>{
+const message = ()=>{
+    router.push({name:'session'})
 }
 // 跳转到联系人页
-const contact = (e:Event)=>{
+const contact = ()=>{
   router.push('contact')
 
 }
 // 跳转到设置页
-const setting = (e:Event)=>{
+const setting = ()=>{
 }
 </script>
 
@@ -68,6 +71,25 @@ const setting = (e:Event)=>{
         margin-top: 20px;
         width: 20px;
         height: 20px;
+    }
+    .unreadMsg {
+        position: relative;
+        text-align: center;
+        font-size: 10px;
+        top:-29px;
+        left:13px;
+        color: #fff;
+        background-color: #fa5151;
+        border-radius: 5px;
+    }
+    .unreadNotice{
+        position: relative;
+        width: 6px;
+        height: 6px;
+        top:-26px;
+        left:18px;
+        border-radius: 50%;
+        background-color: #fa5151;
     }
 
     .select .icon {

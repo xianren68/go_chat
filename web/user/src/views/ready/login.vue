@@ -40,8 +40,10 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {login} from "../../api";
-import {useRouter} from "vue-router";
+import {useRouter} from "vue-router"
 import {ElMessage} from "element-plus"
+import { userStore } from '../../store'
+const {update} = userStore()
 const router = useRouter()
 const name = ref("")
 const pwd = ref("")
@@ -77,7 +79,8 @@ const Login = async ()=>{
     ElMessage.error(data.msg)
     return
   }
-  localStorage.setItem("userInfo",JSON.stringify(data.userInfo))
+  update(data.userInfo)
+  
 
   // 登录成功
   ElMessage.success("登录成功")

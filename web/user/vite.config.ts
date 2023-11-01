@@ -14,8 +14,10 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     })],
   resolve: {
-    alias: {
-      "@": resolve(__dirname, "./src"),
+    alias:[
+      {find:'@',
+      replacement:resolve(__dirname,'./src')
     }
+    ]
   }
 })

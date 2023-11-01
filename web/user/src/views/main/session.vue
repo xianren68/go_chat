@@ -5,7 +5,7 @@
             <div class="item" v-for="(session,i) in sessionList" :key="i" :class="{select:show && i== 0}">
                 <div class="img">
                     <img
-                        :src="session.Avatar == ''?'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU':item.Avatar"
+                        :src="session.Avatar == ''?'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU':session.Avatar"
                         alt="">
                 </div>
                 <div class="desc">
@@ -14,8 +14,8 @@
                 </div>
             </div>
         </div>
-        <div class="msg" v-if="show">
-            <chat  :sessionInfo="sessionList[0]"></chat>
+        <div class="msg">
+            <chat v-if="show"></chat>
         </div>
     </div>
 </template>
@@ -28,19 +28,17 @@ import {useRoute} from "vue-router"
 import chat from "@/components/session/chat.vue"
 
 const {sessionList, updateSessionList} = useSessionStore()
-
 const route = useRoute()
 // 是否有选中的聊天
 const show = ref(false)
 // 获取路由参数
 onBeforeMount(() => {
-    const cur:sessionInt = route.query
+    const cur:any = route.query
     cur.ID = parseInt(cur.ID)
-    console.log(cur)
     // 没有传参
-    if (!cur) return
+    if (isNaN(cur.ID)) return
     show.value = true
-    updateSessionList(cur)
+    updateSessionList(cur as sessionInt)
 })
 </script>
 

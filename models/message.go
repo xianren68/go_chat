@@ -22,6 +22,7 @@ type Message struct {
 	groupId  uint   `json:"group_id"`  // 群聊id
 	Type     int    // 发送消息类型 （群发，私聊）
 	Content  string // 消息内容
+	SendTime int    // 发送时间
 }
 
 // Node 构造连接
@@ -82,18 +83,22 @@ func Chat(c *gin.Context) {
 	rwLocker.Unlock()
 
 	// 发送消息
-	go sendProc(node)
+	go sendProc(Id, node)
 	// 接收消息
 	go recProc(node)
 }
 
 // 发送消息
-func sendProc(node *Node) {
+func sendProc(id uint, node *Node) {
 	for {
 		select {
 		case data := <-node.Data:
 			err := node.Conn.WriteMessage(websocket.TextMessage, data)
+			// 断开连接
 			if err != nil {
+				node.Conn.Close()
+				delete(clientMap, id)
+				saveRedis(id, data)
 				zap.S().Info("failed to send message")
 				return
 			}
@@ -110,7 +115,6 @@ func recProc(node *Node) {
 			return
 		}
 		disPatch(data)
-
 	}
 }
 

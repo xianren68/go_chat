@@ -15,4 +15,31 @@ export interface sessionInt {
     Avatar:string,
     // 当前会话的最后一条消息
     lastMsg?:string,
+    // 未读消息条数
+    unReadCount?:number,
+    // 会话类型
+    type:number,
+    // 最后一条记录的时间
+    lastMsgTime?:number,
 }
+
+// 消息类型
+export interface messageInt {
+    from_id:number,
+    target_id:number,
+    content:string,
+    group_id?:number,
+    type:number,
+    send_time:number,
+    // 发送人名称
+    send_name:string,
+    // 发送人头像
+    avatar:string,
+    // 群聊名称
+    group_name?:string,
+    // 群聊头像
+    group_avatar?:string,
+}
+
+// 从未读消息中获取到的数据
+export type unreadData = {notify:0,msg:0,notifylist:Array<messageInt>,msglist:Array<messageInt>}

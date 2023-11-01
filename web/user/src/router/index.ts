@@ -15,7 +15,7 @@ const routes = [
                 },
                 {
                     name: 'session',
-                    path: 'session',
+                    path: '',
                     component: () => import('@/views/main/session.vue')
                 }
             ]

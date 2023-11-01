@@ -12,7 +12,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import {useContactStore} from "@/store"
 defineProps(['List','modelValue'])
 defineEmits()
 </script>

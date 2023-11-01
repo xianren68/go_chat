@@ -215,7 +215,6 @@ func GetUnread(c *gin.Context) {
 	value, _ := c.Get("userId")
 	id := value.(uint)
 	data := getUnreadList(id)
-	fmt.Println(data, id)
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
 		"data": data,

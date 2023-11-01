@@ -1,6 +1,6 @@
 <template>
     <div class="chat">
-        <div class="top">{{sessionInfo.Name}}</div>
+        <div class="top">{{sessionStore.sessionList[0].Name}}</div>
         <div class="main">
             <div v-for="item in msgList">
                 <meMsg :data="item"></meMsg>
@@ -32,21 +32,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref,reactive } from "vue"
+import { ref,reactive,toRaw} from "vue"
 import socket from "../../api/socket"
-import meMsg from "./meMsg.vue";
-// 获取当前聊天人的信息
-const props = defineProps(["sessionInfo"])
+import meMsg from "./meMsg.vue"
+import { useSessionStore } from "@/store"
+import { putSession, saveMessage} from "@/db";
+import { userStore } from "@/store"
+import { messageInt } from "@/type";
+// 获取会话信息
+const sessionStore = useSessionStore()
+const userstore = userStore()
 // 消息数据
 const message = ref("")
 // 消息列表
-const msgList = reactive([])
+const msgList:Array<any> = reactive([])
 // 发送消息
 const sendMsg = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") as string)
-    console.log(userInfo.id);
-    
-    socket.s?.send(JSON.stringify({from_id:userInfo.ID,target_id:props.sessionInfo.ID,type:1,content:message.value}))
+    // 当前时间
+    const nowData = new Date().getTime()
+    // 消息
+    const send_msg:messageInt = {from_id:userInfo.ID,target_id:sessionStore.sessionList[0].ID,type:1,content:message.value,send_time:nowData,avatar:userstore.getUser()?.Avatar as string,send_name:userstore.getUser()?.Name as string}
+    socket.s?.send(JSON.stringify(send_msg))
+    sessionStore.sessionList[0].lastMsg = message.value
+    sessionStore.sessionList[0].lastMsgTime = nowData
+    // 更新会话
+    putSession(userstore.db as IDBDatabase,'usersession',toRaw(sessionStore.sessionList[0]))
+    // 存储聊天
+    saveMessage(userstore.db as IDBDatabase,send_msg)
     msgList.push({avatar:"",msg:message.value})
     message.value = ""
 }

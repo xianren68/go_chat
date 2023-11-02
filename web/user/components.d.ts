@@ -11,6 +11,7 @@ declare module 'vue' {
     Chat: typeof import('./src/components/session/chat.vue')['default']
     List: typeof import('./src/components/contact/list.vue')['default']
     MeMsg: typeof import('./src/components/session/meMsg.vue')['default']
+    OtherMsg: typeof import('./src/components/session/otherMsg.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UserInfo: typeof import('./src/components/contact/userInfo.vue')['default']

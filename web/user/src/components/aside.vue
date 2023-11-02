@@ -7,13 +7,13 @@
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>
-            <p class="unreadMsg">10</p>
+            <p class="unreadMsg" v-if="userstore.unreadMessage>0">{{userstore.unreadMessage}}</p>
         </a>
         <a class="item" @click="contact" :class="{select:router.currentRoute.value.name == 'contact'}">
             <svg class="icon">
                 <use xlink:href="#icon-contact"></use>
             </svg>
-            <p class="unreadNotice"></p>
+            <p class="unreadNotice" v-if="userstore.unreadNotice"></p>
         </a>
         <a class="setting" @click="setting">
             <svg class="icon">
@@ -25,8 +25,9 @@
 
 <script setup lang="ts">
 import {useRouter} from "vue-router"
-
+import {userStore} from '@/store'
 const router = useRouter()
+const userstore = userStore()
 // 跳转到消息页
 const message = ()=>{
     router.push({name:'session'})
@@ -91,7 +92,9 @@ const setting = ()=>{
         border-radius: 50%;
         background-color: #fa5151;
     }
-
+    p {
+        transition: 0.5s;
+    }
     .select .icon {
         transform: scale(1.2);
         transition: .5s;

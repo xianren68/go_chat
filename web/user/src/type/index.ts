@@ -16,7 +16,7 @@ export interface sessionInt {
     // 当前会话的最后一条消息
     lastMsg?:string,
     // 未读消息条数
-    unReadCount?:number,
+    unReadCount:number,
     // 会话类型
     type:number,
     // 最后一条记录的时间
@@ -41,5 +41,3 @@ export interface messageInt {
     group_avatar?:string,
 }
 
-// 从未读消息中获取到的数据
-export type unreadData = {notify:0,msg:0,notifylist:Array<messageInt>,msglist:Array<messageInt>}

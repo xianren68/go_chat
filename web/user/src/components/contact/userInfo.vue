@@ -43,7 +43,7 @@ const router = useRouter()
 defineProps(['information'])
 // 跳转到聊天页面
 const jumpMsg = (ID:number,Name:string,Avatar:string)=>{
-  router.push({name:'session',query:{ID,Name,Avatar}})
+  router.push({name:'session',query:{ID,Name,Avatar,type:1}})
 }
 </script>
 

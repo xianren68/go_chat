@@ -4,7 +4,6 @@ import {ref} from 'vue'
 const user = defineStore('user',()=>{
     const unreadNotice = ref(false)
     const unreadMessage = ref(0)
-    // db连接
     const db = ref<IDBDatabase>()
     let userInfo:userInt|undefined
     // 登录时

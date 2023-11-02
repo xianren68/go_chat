@@ -10,11 +10,11 @@
 
 <script lang="ts" setup>
 import asideVue from '@/components/aside.vue'
-import { onMounted } from 'vue'
+import { onBeforeMount} from 'vue'
 import {init} from '@/hooks/init'
-onMounted(() => {
+onBeforeMount(async () => {
   // 初始化 socket连接，数据库连接
-  init()
+  await init()
 })
 
 </script>

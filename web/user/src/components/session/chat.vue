@@ -1,7 +1,7 @@
 <template>
     <div class="chat">
         <div class="top">{{ sessionStore.sessionList[0].Name }}</div>
-        <div class="main">
+        <div class="main" ref="main">
             <div v-for="item in messageStore.userMessage.get(sessionStore.sessionList[0].ID)">
                 <meMsg :data="item" v-if="item.from_id === userstore.getUser()?.ID"></meMsg>
                 <otherMsg :data="item" v-else></otherMsg>
@@ -33,20 +33,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onBeforeMount } from "vue"
+import { ref, toRaw, onBeforeMount,onMounted } from "vue"
 import socket from "../../api/socket"
 import meMsg from "./meMsg.vue"
 import otherMsg from "./otherMsg.vue"
 import { useSessionStore, useMessageStore } from "@/store"
-import { putSession, saveMessage } from "@/db";
+import { putSession, saveMessage } from "@/db"
 import { userStore } from "@/store"
-import { messageInt } from "@/type";
+import { messageInt } from "@/type"
 // 获取会话信息
 const sessionStore = useSessionStore()
 const userstore = userStore()
 const messageStore = useMessageStore()
 // 消息数据
 const message = ref("")
+const main = ref()
+
 // 发送消息
 const sendMsg = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") as string)
@@ -54,6 +56,8 @@ const sendMsg = () => {
     const nowData = new Date().getTime()
     // 消息
     const send_msg: messageInt = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar as string, send_name: userstore.getUser()?.Name as string }
+    messageStore.userMessage.get(sessionStore.sessionList[0].ID)?.push(send_msg)
+    message.value = ""
     socket.s?.send(JSON.stringify(send_msg))
     sessionStore.sessionList[0].lastMsg = message.value
     sessionStore.sessionList[0].lastMsgTime = nowData
@@ -61,8 +65,6 @@ const sendMsg = () => {
     putSession(userstore.db as IDBDatabase, 'usersession', toRaw(sessionStore.sessionList[0]))
     // 存储聊天
     saveMessage(userstore.db as IDBDatabase, send_msg)
-    messageStore.userMessage.get(sessionStore.sessionList[0].ID)?.push(send_msg)
-    message.value = ""
 }
 onBeforeMount(async () => {
     // 获取对应的聊天信息
@@ -82,6 +84,15 @@ onBeforeMount(async () => {
     if(type==1){
         putSession(userstore.db as IDBDatabase,'usersession',toRaw(sessionStore.sessionList[0]))
     }
+})
+onMounted(() => {
+    const observer = new MutationObserver((mutationList) => {
+    mutationList.forEach(mutation => {
+        let d:any = mutation.addedNodes.item(mutation.addedNodes.length-1)
+        d.scrollIntoView()
+    });
+});
+observer.observe(main.value, { childList: true});
 })
 </script>
 

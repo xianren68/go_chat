@@ -17,15 +17,12 @@ const messageStore = defineStore('message',()=>{
         }
         // 获取已读消息
        const data = await getMessage(userstore.db as IDBDatabase,from_id)
-       console.log(data)
        const list = [...data]
         // 判断是否有未读消息
         if(unread > 0){
             // 读取未读消息
             const unreadList = await getunRead(userstore.db as IDBDatabase,from_id)
             list.push(...unreadList)
-            console.log(unreadList)
-            console.log(list)
             // 全部存入已读消息
             for(let i of unreadList){
                 saveMessage(userstore.db as IDBDatabase,i)

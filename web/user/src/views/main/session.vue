@@ -2,7 +2,7 @@
     <div class="message">
         <!--聊天用户列表-->
         <div class="list">
-            <div class="item" v-for="(session, i) in sessionStore.sessionList" :key="i" :class="{ select: show && i == 0 }" @click="switchSession(session.ID,session.type)">
+            <div class="item" v-for="(session, i) in sessionStore.sessionList" :key="i" :class="{ select: route.name == 'chat' && i == 0 }" @click="switchSession(session.ID,session.type)">
                 <div class="img">
                     <img :src="session.Avatar == '' ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU' : session.Avatar"
                         alt="">
@@ -20,21 +20,19 @@
             </div>
         </div>
         <div class="msg">
-            <chat v-if="show"></chat>
+            <router-view></router-view>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useSessionStore} from "@/store"
-import { onBeforeMount, ref } from "vue"
+import { onBeforeMount } from "vue"
 import { sessionInt } from "@/type"
-import { useRoute } from "vue-router"
-import chat from "@/components/session/chat.vue"
+import { useRouter,useRoute } from "vue-router"
 const sessionStore = useSessionStore()
 const route = useRoute()
-// 是否有选中的聊天
-const show = ref(false)
+const router = useRouter()
 // 转换时间戳
 const transformTime = (time:number):string=>{
     const date = new Date(time)
@@ -42,8 +40,8 @@ const transformTime = (time:number):string=>{
 }
 // 切换会话
 const switchSession = (id:number,type:number)=>{
-    show.value = true
     sessionStore.switchSession(id,type)
+    router.push({name:'chat'})
 }
 // 获取路由参数
 onBeforeMount(() => {
@@ -53,8 +51,8 @@ onBeforeMount(() => {
     // 没有传参
     if (isNaN(cur.ID)) return
     cur.unReadCount = 0
-    show.value = true
     sessionStore.updateSessionList(cur as sessionInt)
+    router.push({name:'chat'})
 })
 </script>
 

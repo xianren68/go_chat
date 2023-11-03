@@ -2,7 +2,7 @@
     <div class="chat">
         <div class="top">{{ sessionStore.sessionList[0].Name }}</div>
         <div class="main" ref="main">
-            <div v-for="item in messageStore.userMessage.get(sessionStore.sessionList[0].ID)">
+            <div v-for="item in messageStore.messageList">
                 <meMsg :data="item" v-if="item.from_id === userstore.getUser()?.ID"></meMsg>
                 <otherMsg :data="item" v-else></otherMsg>
             </div>
@@ -33,10 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onBeforeMount,onMounted } from "vue"
+import { ref, toRaw, onBeforeMount, onMounted } from "vue"
 import socket from "../../api/socket"
-import meMsg from "./meMsg.vue"
-import otherMsg from "./otherMsg.vue"
+import meMsg from "@/components/session/meMsg.vue"
+import otherMsg from "@/components/session/otherMsg.vue"
 import { useSessionStore, useMessageStore } from "@/store"
 import { putSession, saveMessage } from "@/db"
 import { userStore } from "@/store"
@@ -56,10 +56,10 @@ const sendMsg = () => {
     const nowData = new Date().getTime()
     // 消息
     const send_msg: messageInt = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar as string, send_name: userstore.getUser()?.Name as string }
-    messageStore.userMessage.get(sessionStore.sessionList[0].ID)?.push(send_msg)
+    messageStore.messageList.push(send_msg)
     message.value = ""
     socket.s?.send(JSON.stringify(send_msg))
-    sessionStore.sessionList[0].lastMsg = message.value
+    sessionStore.sessionList[0].lastMsg = send_msg.content
     sessionStore.sessionList[0].lastMsgTime = nowData
     // 更新会话
     putSession(userstore.db as IDBDatabase, 'usersession', toRaw(sessionStore.sessionList[0]))
@@ -70,29 +70,30 @@ onBeforeMount(async () => {
     // 获取对应的聊天信息
     const { ID, type, unReadCount } = sessionStore.sessionList[0]
     if (type == 1) {
-        // 获取聊天信息
-        await messageStore.getuserMessage(ID, unReadCount as number)
+        // 更新聊天列表
+        await messageStore.replaceList(ID, unReadCount as number,type)
     }
     // 减去未读消息
-    if (unReadCount == 0){
+    if (unReadCount == 0) {
         return
     }
     // 减去小红点的次数
     userstore.unreadMessage -= unReadCount
     sessionStore.sessionList[0].unReadCount = 0
     // 更新会话
-    if(type==1){
-        putSession(userstore.db as IDBDatabase,'usersession',toRaw(sessionStore.sessionList[0]))
+    if (type == 1) {
+        putSession(userstore.db as IDBDatabase, 'usersession', toRaw(sessionStore.sessionList[0]))
     }
 })
 onMounted(() => {
     const observer = new MutationObserver((mutationList) => {
-    mutationList.forEach(mutation => {
-        let d:any = mutation.addedNodes.item(mutation.addedNodes.length-1)
-        d.scrollIntoView()
-    });
-});
-observer.observe(main.value, { childList: true});
+        // 监听子元素变化，以便让聊天随时处于可视区域内
+        mutationList.forEach(mutation => {
+            let d: any = mutation.addedNodes.item(mutation.addedNodes.length - 1)
+            d.scrollIntoView()
+        })
+    })
+    observer.observe(main.value, { childList: true });
 })
 </script>
 
@@ -113,7 +114,7 @@ observer.observe(main.value, { childList: true});
     }
 
     .main {
-        height: 80%;
+        height: 75%;
         padding: 0 10px;
         padding-top: 20px;
         overflow: scroll;
@@ -127,6 +128,7 @@ observer.observe(main.value, { childList: true});
         flex-grow: 1;
 
         .send-main {
+            margin-top: 15px;
             display: flex;
             align-items: center;
 

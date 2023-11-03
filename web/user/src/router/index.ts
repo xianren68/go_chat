@@ -16,7 +16,14 @@ const routes = [
                 {
                     name: 'session',
                     path: '',
-                    component: () => import('@/views/main/session.vue')
+                    component: () => import('@/views/main/session.vue'),
+                    children:[
+                        {
+                            name:'chat',
+                            path:'/chat',
+                            component:() => import('@/views/main/chat.vue')
+                        }
+                    ]
                 }
             ]
 

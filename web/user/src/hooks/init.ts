@@ -83,5 +83,7 @@ export async function init() {
   sessionStore.sessionList.push(...groupMap.values())
   // 按时间排序
   sessionStore.sessionList.sort((i, j) => (j.lastMsgTime as number) - (i.lastMsgTime as number))
+  // 开始socket接收消息
+  socket.receive()
 
 }

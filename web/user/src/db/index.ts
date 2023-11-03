@@ -46,8 +46,8 @@ export function insertData(db: IDBDatabase, tableName: string, data: messageInt)
     }
 }
 
-// 获取并删除未读消息数据
-export function getunRead(db: IDBDatabase,from_id:number): Promise<Array<messageInt>> {
+// 获取并删除未读私聊消息数据
+export function getUserUnRead(db: IDBDatabase,from_id:number): Promise<Array<messageInt>> {
     return new Promise((resolve) => {
         let data:Array<messageInt> = []
         const store = db.transaction(['unRead'], 'readwrite').objectStore('unRead')
@@ -119,8 +119,8 @@ export function saveMessage(db: IDBDatabase, data: messageInt) {
     db.transaction(['message'], 'readwrite').objectStore('message').add(data)
 }
 
-// 获取消息
-export function getMessage(db: IDBDatabase, from_id: number): Promise<Array<messageInt>> {
+// 获取私聊消息
+export function getUserMessage(db: IDBDatabase, from_id: number): Promise<Array<messageInt>> {
     return new Promise((resolve) => {
         const data: Array<messageInt> = []
         const store = db.transaction(['message'],'readwrite').objectStore('message')

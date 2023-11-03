@@ -1,8 +1,10 @@
 package main
 
 import (
+	"go_chat/global"
 	"go_chat/initialize"
 	"go_chat/router"
+	"strings"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 	initialize.InitRedis()
 	// 启动端口监听
 	r := router.Router()
-	err := r.Run(":8080")
+	err := r.Run(strings.Join([]string{":", global.ServiceConfig.Port}, ""))
 	if err != nil {
 		panic(err)
 	}

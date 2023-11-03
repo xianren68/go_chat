@@ -75,7 +75,7 @@ const Login = async ()=>{
     return
   }
   const {data} = await login({name:name.value,password:pwd.value})
-  if(data.code == -1){
+  if(data.code !=0){
     ElMessage.error(data.msg)
     return
   }

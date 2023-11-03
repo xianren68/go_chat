@@ -6,7 +6,7 @@ import (
 )
 
 // FindUsers 返回群组中用户id
-func FindUsers(groupId uint) (group []uint, code int) {
+func FindUsers(groupId uint) (group []uint) {
 	relations := make([]*models.Relation, 0)
 	if tx := global.DB.Where("target_id= ? and type = 2", groupId).Find(&relations); tx.RowsAffected == 0 {
 		// 没有成员

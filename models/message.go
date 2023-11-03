@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 	"go_chat/common"
+	"go_chat/dao"
 	"go_chat/global"
 	"go_chat/middleware"
 	"gopkg.in/fatih/set.v0"
@@ -136,12 +137,16 @@ func disPatch(data []byte) {
 		sendMsgAndSave(msg.TargetId, data)
 		// 群聊
 	case 2:
-		// sendGroup(msg.FormId, msg.TargetId)
+		sendGroup(msg.groupId, data)
 	case 3:
-		// 请求添加好友
+	// 请求添加好友
+	case 4:
+		// 请求加入群聊
 	}
 
 }
+
+// 发送/存储消息
 func sendMsgAndSave(id uint, msg []byte) {
 	rwLocker.Lock()
 	node, ok := clientMap[id]
@@ -155,9 +160,20 @@ func sendMsgAndSave(id uint, msg []byte) {
 	node.Data <- msg
 }
 
+// 存储消息到redis
 func saveRedis(id uint, msg []byte) {
 	ctx := context.Background()
 	key := "list" + strconv.Itoa(int(id))
 	_, _ = global.RedisDB.LPush(ctx, key, string(msg)).Result()
+}
 
+// 群聊消息处理
+func sendGroup(groupId uint, data []byte) {
+	// 从数据库中获取所有的群成员
+	userList := dao.FindUsers(groupId)
+	// 发送/存储消息
+	for _, user := range userList {
+		// 给每个群成员发送
+		sendMsgAndSave(user, data)
+	}
 }

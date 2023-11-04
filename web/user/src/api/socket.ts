@@ -30,10 +30,11 @@ const socket = {
             // 通知
             if (val.type > 2) {
                 userstore.unreadNotice = true
-                insertData(userstore.db as IDBDatabase, 'unRead', val)
+                insertData(userstore.db!, 'unRead', val)
+                return
             }
             let index: number
-            // 正好处于当前会话
+            // 正好处于当前会话(加入消息列表，更新会话即可)
             if (router.currentRoute.value.name == 'chat' &&
                 ((val.type == 1 && val.from_id == sessionStore.sessionList[0].ID) ||
                     (val.type == 2 && val.group_id == sessionStore.sessionList[0].ID))) {
@@ -47,19 +48,19 @@ const socket = {
                 index = 0
             } else {
                 userstore.unreadMessage++
-                insertData(userstore.db as IDBDatabase,'unRead',val)
+                insertData(userstore.db!,'unRead',val)
                 let session: any
                 if (val.type == 1) {
                     // 寻找对应会话
                     index = sessionStore.sessionList.findIndex((item) => item.ID == val.from_id)
                     if (index == -1) {
-                        session = { ID: val.from_id, Name: val.send_name, Avatar: val.avatar, lastMsg: val.send_name, lastMsgTime: val.send_time, type: 1, unReadCount: 1 }
+                        session = { ID: val.from_id, Name: val.send_name, Avatar: val.avatar, lastMsg: val.content, lastMsgTime: val.send_time, type: 1, unReadCount: 1 }
                     }
                 } else {
                     // 寻找对应会话
                     index = sessionStore.sessionList.findIndex((item) => item.ID == val.group_id)
                     if (index == -1) {
-                        session = { ID: val.group_id as number, Name: val.group_name as string, Avatar: val.group_avatar as string, lastMsg: val.send_name, lastMsgTime: val.send_time, type: 2, unReadCount: 1 }
+                        session = { ID: val.group_id!, Name: val.group_name!, Avatar: val.group_avatar!, lastMsg: val.content, lastMsgTime: val.send_time, type: 2, unReadCount: 1 }
                     }
                 }
                 // 更新会话

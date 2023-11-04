@@ -15,7 +15,7 @@
               <svg class="icon">
                 <use xlink:href="#icon-youxiang"></use>
               </svg>
-                <span>{{information.Email == ""?"未绑定手机号":information.Email}}</span>
+                <span>{{information.Email == ""?"未绑定邮箱":information.Email}}</span>
               </div>
             <div class="connect">
               <svg class="icon" @click="jumpMsg(information.ID,information.Name,information.Avatar)">

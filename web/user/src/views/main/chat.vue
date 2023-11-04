@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onBeforeMount, onMounted } from "vue"
+import { ref, toRaw, onMounted } from "vue"
 import socket from "../../api/socket"
 import meMsg from "@/components/session/meMsg.vue"
 import otherMsg from "@/components/session/otherMsg.vue"
@@ -55,42 +55,31 @@ const sendMsg = () => {
     // 当前时间
     const nowData = new Date().getTime()
     // 消息
-    const send_msg: messageInt = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar as string, send_name: userstore.getUser()?.Name as string }
+    let send_msg: messageInt
+    if(sessionStore.sessionList[0].type  == 1){
+        // 私聊
+         send_msg = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name! }
+    }else {
+        // 群聊
+        send_msg = { from_id: userInfo.ID, target_id: 0, type: 2, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,group_id:sessionStore.sessionList[0].ID,group_avatar:sessionStore.sessionList[0].Avatar,group_name:sessionStore.sessionList[0].Name}
+    }
+    
     messageStore.messageList.push(send_msg)
     message.value = ""
     socket.s?.send(JSON.stringify(send_msg))
     sessionStore.sessionList[0].lastMsg = send_msg.content
     sessionStore.sessionList[0].lastMsgTime = nowData
     // 更新会话
-    putSession(userstore.db as IDBDatabase, 'usersession', toRaw(sessionStore.sessionList[0]))
+    putSession(userstore.db!, 'usersession', toRaw(sessionStore.sessionList[0]))
     // 存储聊天
-    saveMessage(userstore.db as IDBDatabase, send_msg)
+    saveMessage(userstore.db!, send_msg)
 }
-onBeforeMount(async () => {
-    // 获取对应的聊天信息
-    const { ID, type, unReadCount } = sessionStore.sessionList[0]
-    if (type == 1) {
-        // 更新聊天列表
-        await messageStore.replaceList(ID, unReadCount as number,type)
-    }
-    // 减去未读消息
-    if (unReadCount == 0) {
-        return
-    }
-    // 减去小红点的次数
-    userstore.unreadMessage -= unReadCount
-    sessionStore.sessionList[0].unReadCount = 0
-    // 更新会话
-    if (type == 1) {
-        putSession(userstore.db as IDBDatabase, 'usersession', toRaw(sessionStore.sessionList[0]))
-    }
-})
 onMounted(() => {
     const observer = new MutationObserver((mutationList) => {
         // 监听子元素变化，以便让聊天随时处于可视区域内
         mutationList.forEach(mutation => {
             let d: any = mutation.addedNodes.item(mutation.addedNodes.length - 1)
-            d.scrollIntoView()
+            d?.scrollIntoView()
         })
     })
     observer.observe(main.value, { childList: true });

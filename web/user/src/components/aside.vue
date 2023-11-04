@@ -3,7 +3,7 @@
         <div class="avatar">
             <img src="../assets/img/avatar.jpg" alt="">
         </div>
-        <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'session'}">
+        <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'session'||router.currentRoute.value.name == 'chat' }">
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>

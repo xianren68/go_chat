@@ -2,7 +2,8 @@
     <div class="message">
         <!--聊天用户列表-->
         <div class="list">
-            <div class="item" v-for="(session, i) in sessionStore.sessionList" :key="i" :class="{ select: route.name == 'chat' && i == 0 }" @click="switchSession(session.ID,session.type)">
+            <div class="item" v-for="(session, i) in sessionStore.sessionList" :key="i"
+                :class="{ select: route.name == 'chat' && i == 0 }" @click="switchSession(session.ID, session.type)">
                 <div class="img">
                     <img :src="session.Avatar == '' ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU' : session.Avatar"
                         alt="">
@@ -14,8 +15,8 @@
                     <p class="line">{{ session?.lastMsg }}</p>
                 </div>
                 <div class="info">
-                    <div class="time">{{session.lastMsgTime?transformTime(session.lastMsgTime):""}}</div>
-                    <div class="unread" v-if="session.unReadCount">{{session.unReadCount}}</div>
+                    <div class="time">{{ session.lastMsgTime ? transformTime(session.lastMsgTime) : "" }}</div>
+                    <div class="unread" v-if="session.unReadCount">{{ session.unReadCount }}</div>
                 </div>
             </div>
         </div>
@@ -26,22 +27,35 @@
 </template>
 
 <script setup lang="ts">
-import { useSessionStore} from "@/store"
-import { onBeforeMount } from "vue"
+import { useSessionStore, useMessageStore, userStore } from "@/store"
+import { onBeforeMount,toRaw } from "vue"
 import { sessionInt } from "@/type"
-import { useRouter,useRoute } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
+import { putSession } from "@/db";
 const sessionStore = useSessionStore()
+const messageStore = useMessageStore()
+const userstore = userStore()
 const route = useRoute()
 const router = useRouter()
 // 转换时间戳
-const transformTime = (time:number):string=>{
+const transformTime = (time: number): string => {
     const date = new Date(time)
-    return "" + date.getHours() +":" + date.getMinutes()
+    return "" + date.getHours() + ":" + date.getMinutes()
 }
 // 切换会话
-const switchSession = (id:number,type:number)=>{
-    sessionStore.switchSession(id,type)
-    router.push({name:'chat'})
+const switchSession = async (id: number, type: number) => {
+    sessionStore.switchSession(id, type)
+    // 获取对应的聊天信息
+    const { unReadCount } = sessionStore.sessionList[0]
+    const ID = id
+    // 更新聊天列表
+    await messageStore.replaceList(ID, unReadCount as number, type)
+    // 减去小红点的次数
+    userstore.unreadMessage -= unReadCount
+    sessionStore.sessionList[0].unReadCount = 0
+    // 更新会话
+    putSession(userstore.db!,sessionStore.sessionList[0].type == 1?"usersession":"groupsession",toRaw(sessionStore.sessionList[0]))
+    router.push({ name: 'chat' })
 }
 // 获取路由参数
 onBeforeMount(() => {
@@ -52,7 +66,7 @@ onBeforeMount(() => {
     if (isNaN(cur.ID)) return
     cur.unReadCount = 0
     sessionStore.updateSessionList(cur as sessionInt)
-    router.push({name:'chat'})
+    router.push({ name: 'chat' })
 })
 </script>
 
@@ -98,6 +112,7 @@ onBeforeMount(() => {
                 margin-left: 10px;
                 display: flex;
                 flex-direction: column;
+
                 .name {
                     font-size: 14px;
                     margin-bottom: 5px;
@@ -107,26 +122,27 @@ onBeforeMount(() => {
                 .line {
                     font-size: 12px;
                     color: #aaa;
-                    white-space: nowrap;  
+                    white-space: nowrap;
 
-                    text-overflow:ellipsis; 
-                   
-                    overflow:hidden;
+                    text-overflow: ellipsis;
+
+                    overflow: hidden;
                 }
 
             }
 
             .info {
-                display:flex;
+                display: flex;
                 flex-direction: column;
                 height: 80%;
                 align-items: center;
+
                 .unread {
                     height: 14px;
                     width: 14px;
                     font-size: 10px;
                     line-height: 14px;
-                    color:#fff;
+                    color: #fff;
                     text-align: center;
                     border-radius: 50%;
                     background-color: #fa5151;
@@ -162,5 +178,4 @@ onBeforeMount(() => {
 .msg {
     height: 100%;
     flex-grow: 1;
-}
-</style>
+}</style>

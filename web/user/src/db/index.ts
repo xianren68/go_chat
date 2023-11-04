@@ -46,6 +46,76 @@ export function insertData(db: IDBDatabase, tableName: string, data: messageInt)
     }
 }
 
+// 获取会话信息
+export function getSession(db: IDBDatabase, tableName: string): Promise<{ count: number, map: Map<number, sessionInt> }> {
+    return new Promise((resolve) => {
+        let data = { count: <number>0, map: new Map<number, sessionInt>() }
+        const store = db.transaction([tableName], 'readonly').objectStore(tableName)
+        const request = store.openCursor()
+        request.onsuccess = () => {
+            let cursor = request.result
+            if (cursor) {
+                let d = cursor.value
+                data.count += d.unReadCount
+                data.map.set(d.id, d)
+                cursor.continue()
+            }
+            resolve(data)
+        }
+
+    })
+}
+// 更新/插入会话信息
+export function putSession(db: IDBDatabase, tableName: string, data: sessionInt) {
+    db.transaction([tableName], 'readwrite').objectStore(tableName).put(data)
+}
+
+// 判断是否有未读通知
+export function isExistNotify(db: IDBDatabase): Promise<boolean> {
+    return new Promise((resolve) => {
+        const store = db.transaction(['message'], 'readonly').objectStore('message')
+        const request = store.openCursor()
+        request.onsuccess = () => {
+            let cursor = request.result
+            if (cursor) {
+                let d = cursor.value
+                if (d.type > 2) {
+                    resolve(true)
+                    return
+                }
+                cursor.continue
+            }
+            resolve(false)
+        }
+    })
+}
+
+// 存储聊天信息
+export function saveMessage(db: IDBDatabase, data: messageInt) {
+    db.transaction(['message'], 'readwrite').objectStore('message').add(data)
+}
+
+
+// 获取私聊消息
+export function getUserMessage(db: IDBDatabase, from_id: number): Promise<Array<messageInt>> {
+    return new Promise((resolve) => {
+        const data: Array<messageInt> = []
+        const store = db.transaction(['message'],'readwrite').objectStore('message')
+        const request = store.openCursor()
+        request.onsuccess = () => {
+            let cursor = request.result
+            if (cursor) {
+                let d = cursor.value
+                if (d.type == 1 && (d.target_id == from_id || d.from_id == from_id)) {
+                    data.push(d)
+                }
+                cursor.continue()
+            }else{
+                resolve(data)
+            }
+        }
+    })
+}
 // 获取并删除未读私聊消息数据
 export function getUserUnRead(db: IDBDatabase,from_id:number): Promise<Array<messageInt>> {
     return new Promise((resolve) => {
@@ -69,73 +139,45 @@ export function getUserUnRead(db: IDBDatabase,from_id:number): Promise<Array<mes
 
     })
 }
-// 获取会话信息
-export function getSession(db: IDBDatabase, tableName: string): Promise<{ count: number, map: Map<number, sessionInt> }> {
-    return new Promise((resolve) => {
-        let data = { count: <number>0, map: new Map<number, sessionInt>() }
-        const store = db.transaction([tableName], 'readonly').objectStore(tableName)
+// 获取群聊消息
+export function getGroupMessage(db:IDBDatabase,group_id:number):Promise<Array<messageInt>>{
+    return new Promise((resolve)=>{
+        let data:Array<messageInt> = []
+        const store  = db.transaction(['message'],'readwrite').objectStore('message')
         const request = store.openCursor()
-        request.onsuccess = () => {
-            let cursor = request.result
-            if (cursor) {
+        request.onsuccess = ()=>{
+            const cursor = request.result
+            if(cursor){
                 let d = cursor.value
-                data.count += d.unReadCount
-                data.map.set(d.id, d)
-                cursor.continue()
-            }
-            resolve(data)
-        }
-
-    })
-}
-
-// 判断是否有未读通知
-export function isExistNotify(db: IDBDatabase): Promise<boolean> {
-    return new Promise((resolve) => {
-        const store = db.transaction(['message'], 'readonly').objectStore('message')
-        const request = store.openCursor()
-        request.onsuccess = () => {
-            let cursor = request.result
-            if (cursor) {
-                let d = cursor.value
-                if (d.type > 2) {
-                    resolve(true)
-                    return
-                }
-                cursor.continue
-            }
-            resolve(false)
-        }
-    })
-}
-
-// 更新/插入会话信息
-export function putSession(db: IDBDatabase, tableName: string, data: sessionInt) {
-    db.transaction([tableName], 'readwrite').objectStore(tableName).put(data)
-}
-
-// 存储聊天信息
-export function saveMessage(db: IDBDatabase, data: messageInt) {
-    db.transaction(['message'], 'readwrite').objectStore('message').add(data)
-}
-
-// 获取私聊消息
-export function getUserMessage(db: IDBDatabase, from_id: number): Promise<Array<messageInt>> {
-    return new Promise((resolve) => {
-        const data: Array<messageInt> = []
-        const store = db.transaction(['message'],'readwrite').objectStore('message')
-        const request = store.openCursor()
-        request.onsuccess = () => {
-            let cursor = request.result
-            if (cursor) {
-                let d = cursor.value
-                if (d.type == 1 && (d.target_id == from_id || d.from_id == from_id)) {
-                    data.push(d)
+                if(d.group_id == group_id){
+                    data.push(cursor.value)
                 }
                 cursor.continue()
             }else{
                 resolve(data)
             }
         }
+    })
+}
+// 获取并删除未读群聊消息
+export function getGroupUnRead(db:IDBDatabase,group_id:number):Promise<Array<messageInt>>{
+    return new Promise((resolve)=>{
+        let data:Array<messageInt> = []
+        const store  = db.transaction(['unRead'],'readwrite').objectStore('unRead')
+        const request = store.openCursor()
+        request.onsuccess = ()=>{
+            const cursor = request.result
+            if(cursor){
+                let d = cursor.value
+                if(d.group_id == group_id){
+                    data.push(cursor.value)
+                    cursor.delete()
+                }
+                cursor.continue()
+            }else{
+                resolve(data)
+            }
+        }
+        
     })
 }

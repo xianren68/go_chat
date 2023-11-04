@@ -8,6 +8,15 @@ export interface userInt {
     Gender:string,
     Line:string
 }
+// 群组类型
+export interface groupInt {
+    Name:string,
+    ID:number,
+    OwnerId:number,
+    Avatar:string,
+    Line:string,
+    Type:number
+}
 // 会话类型
 export interface sessionInt {
     ID:number,

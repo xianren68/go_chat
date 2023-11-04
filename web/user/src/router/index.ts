@@ -20,7 +20,7 @@ const routes = [
                     children:[
                         {
                             name:'chat',
-                            path:'/chat',
+                            path:'chat',
                             component:() => import('@/views/main/chat.vue')
                         }
                     ]

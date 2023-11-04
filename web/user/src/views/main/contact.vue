@@ -21,10 +21,10 @@
       <div class="group" :class="{select:!switchCt}" @click="switchGroup">群组</div>
     </div>
     <!--    列表-->
-    <List :List="contactPerson" v-model="selectIndex"></List>
+    <List :List="switchCt?contactStore.contactPerson:contactStore.groupList" v-model="selectIndex"></List>
   </div>
     <div class="right">
-      <UserInfo v-if="selectIndex >=0" :information="contactPerson[selectIndex]"></UserInfo>
+      <UserInfo v-if="selectIndex >=0 && switchCt" :information="contactStore.contactPerson[selectIndex]"></UserInfo>
     </div>
   </div>
 </template>
@@ -32,17 +32,33 @@
 <script setup lang="ts">
 import { ref} from 'vue'
 import {useContactStore} from "../../store"
-import {onBeforeMount} from "vue"
+import {onBeforeMount,watch} from "vue"
 import List from '@/components/contact/list.vue'
-import UserInfo from "@/components/contact/userInfo.vue";
+import UserInfo from "@/components/contact/userInfo.vue"
+import {useRouter} from 'vue-router'
+const router = useRouter()
 // 控制搜索框是否显示
 const isShow = ref(false)
 // 控制选择好友还是群组
 const switchCt = ref(true)
-// 选中的好友
+// 选中的索引
 const selectIndex = ref(-1)
+// 跳转到群聊会话
+const jumpSession = (index:number)=>{
+  const {ID,Name,Avatar} = contactStore.groupList[index]
+  router.push({name:'session',query:{ID,Name,Avatar,type:2}})
+}
+// 监听索引的变化
+watch(selectIndex,(newSelect)=>{
+  // 如果在群聊列表，直接跳转
+  console.log(switchCt.value);
+  
+  if(!switchCt.value){
+    jumpSession(newSelect)
+  }
+})
 // 好友
-const {contactPerson,getFriendList} = useContactStore()
+const contactStore = useContactStore()
 // 切换到用户列表
 const switchFriend = ()=>{
   switchCt.value = true
@@ -50,10 +66,16 @@ const switchFriend = ()=>{
 // 切换到群组列表
 const switchGroup = ()=>{
   switchCt.value = false
+  if(contactStore.groupList.length == 0){
+    contactStore.getGroupList()
+  }
 }
 // 挂载之前，获取用户列表
 onBeforeMount(()=>{
-  getFriendList()
+  selectIndex.value = -1
+  if(contactStore.contactPerson.length == 0){
+    contactStore.getFriendList()
+  }
 })
 </script>
 

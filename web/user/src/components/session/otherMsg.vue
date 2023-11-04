@@ -3,9 +3,15 @@
         <div class="avatar">
             <img :src="data.Avatar == '' ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU' : data.Avatar" alt="">
         </div>
-        <span class="content">
-            {{data.content}}
-        </span>
+        <div class="content">
+            <span class="name" v-if="data.type != 1">
+                {{data.send_name}}
+            </span>
+            <span class="msg">
+                {{data.content}}
+            </span>
+        </div>
+        
     </div>
 </template>
 
@@ -30,19 +36,28 @@ defineProps(['data'])
 
             }
         }
-        .content{
+        .content {
             max-width: 40%;
-            min-height: 30px;
-            margin-right: 5px;
-            border-radius: 10px;
-            line-height: 30px;
-            padding: 0 4px;
-            background-color:#fff;
-            border: 1px solid #eee;
-            font-family: fira code;
-            font-size: 16px;
-            color: #000;
-
+            .name {
+                display: block;
+                font-size:12px ;
+                color: #aaa;
+                margin-bottom: 3px;
+            }
+            .msg{
+                display: inline-block;
+                max-width: 100%;
+                min-height: 30px;
+                margin-right: 5px;
+                border-radius: 5px;
+                line-height: 30px;
+                padding: 0 4px;
+                background-color:#fcf;
+                font-family: fira code;
+                font-size: 16px;
+                color: #000;
+    
+            }
         }
 
     }

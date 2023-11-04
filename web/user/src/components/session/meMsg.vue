@@ -23,7 +23,7 @@ defineProps(['data'])
             max-width: 40%;
             min-height: 30px;
             margin-right: 5px;
-            border-radius: 10px;
+            border-radius: 5px;
             line-height: 30px;
             padding: 0 4px;
             background-color: #526fff;

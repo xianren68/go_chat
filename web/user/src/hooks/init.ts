@@ -59,13 +59,13 @@ export async function init() {
           groupSession.unReadCount ? groupSession.unReadCount++ : groupSession.unReadCount = 1
         } else {
           groupSession = {
-            ID: value.group_id as number, Name: value.group_name as string, Avatar: value.group_avatar as string,
+            ID: value.group_id!, Name: value.group_name!, Avatar: value.group_avatar!,
             lastMsg: value.content, lastMsgTime: value.send_time, type: 2,unReadCount:1
           }
         }
         // 添加/更新会话到数据库
         putSession(db,'groupsession',groupSession)
-        groupMap.set(value.from_id, groupSession)
+        groupMap.set(value.group_id as number, groupSession)
         // 存进数据库
         insertData(db, "unRead", value)
       } else {

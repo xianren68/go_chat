@@ -5,3 +5,5 @@ export const login = (data:{name:string,password:string})=>req.post('/login',dat
 export const getPersonList = ()=>req.get('/auth/relation/friendlist')
 // 获取未读消息
 export const getUnreadMsg = ()=>req.get('/auth/user/unread')
+// 获取加入的群列表
+export const getCommunityList = ()=>req.get('/auth/relation/grouplist')

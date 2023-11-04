@@ -207,7 +207,7 @@ func DeleteUser(ctx *gin.Context) {
 
 // SendUserMsg 发送消息
 func SendUserMsg(c *gin.Context) {
-	models.Chat(c)
+	dao.Chat(c)
 }
 
 // GetUnread 获取用户未读消息

@@ -45,6 +45,7 @@ func NewGroup(c *gin.Context) {
 
 // GetGroupList 获取群列表
 func GetGroupList(c *gin.Context) {
+	// 从token中获取id
 	value, _ := c.Get("userId")
 	group, code := dao.GetCommunities(value.(uint))
 	if code != 0 {

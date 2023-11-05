@@ -33,7 +33,6 @@ const messageStore = defineStore('message',()=>{
         for(let i of unreadList){
             saveMessage(db,i)
         }
-        console.log(unreadList)
         messageList.push(...unreadList)
         
    }

@@ -9,3 +9,5 @@ export const getUnreadMsg = ()=>req.get('/auth/user/unread')
 export const getCommunityList = ()=>req.get('/auth/relation/grouplist')
 // 注册用户
 export const register = (data:{name:string,password:string,identity:string})=>req.post('/new',data)
+// 获取emoji表情
+export const getEmojis = ()=>req.get('/auth/user/emojis')

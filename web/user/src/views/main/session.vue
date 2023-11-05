@@ -40,7 +40,12 @@ const router = useRouter()
 // 转换时间戳
 const transformTime = (time: number): string => {
     const date = new Date(time)
-    return "" + date.getHours() + ":" + date.getMinutes()
+    const  minutes = date.getMinutes()
+    if(minutes-10 < 0){
+        return "" + date.getHours() + ":" + "0" +minutes
+    }
+    return "" + date.getHours() + ":" +minutes
+    
 }
 // 切换会话
 const switchSession = async (id: number, type: number) => {

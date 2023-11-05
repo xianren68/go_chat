@@ -15,7 +15,7 @@
                         <use xlink:href="#icon-huatong"></use>
                     </svg>
                     <input v-model="message">
-                    <svg class="icon">
+                    <svg class="icon" @click="emojiShow = !emojiShow" :class="{select_icon:emojiShow}">
                         <use xlink:href="#icon-biaoqing"></use>
                     </svg>
                     <svg class="icon">
@@ -30,6 +30,7 @@
             </div>
         </div>
     </div>
+    <Emoji v-if="emojiShow" @insertEmoji="insertEmoji"></Emoji>
 </template>
 
 <script setup lang="ts">
@@ -41,14 +42,20 @@ import { useSessionStore, useMessageStore } from "@/store"
 import { putSession, saveMessage } from "@/db"
 import { userStore } from "@/store"
 import { messageInt } from "@/type"
+import Emoji from "@/components/emoji.vue"
 // 获取会话信息
 const sessionStore = useSessionStore()
 const userstore = userStore()
 const messageStore = useMessageStore()
+// 控制表情是否展开
+const emojiShow = ref(false)
+// 插入表情
+const insertEmoji = (arg:string)=>{
+    message.value += arg
+}
 // 消息数据
 const message = ref("")
 const main = ref()
-
 // 发送消息
 const sendMsg = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") as string)
@@ -166,6 +173,9 @@ onMounted(() => {
 
         }
 
+    }
+    .select_icon{
+        fill: #4a499b;
     }
 }
 </style>

@@ -6,7 +6,6 @@
         <div class="content">
           <div class="style"></div>
             <router-view></router-view>
-
         </div>
     </div>
 </template>

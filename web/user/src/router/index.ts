@@ -37,6 +37,11 @@ const routes = [
                 path: '/',
                 name: 'login',
                 component: () => import('@/views/ready/login.vue')
+            },
+            {
+                path:'register',
+                name:'register',
+                component:()=> import('@/views/ready/register.vue')
             }
         ]
     }
@@ -48,7 +53,7 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to) => {
     let token = localStorage.getItem("token")
-    if (!token && to.name != 'login') {
+    if (!token && to.name != 'login' && to.name != 'register') {
         return {name: 'login'}
     }
 })

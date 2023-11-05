@@ -7,3 +7,5 @@ export const getPersonList = ()=>req.get('/auth/relation/friendlist')
 export const getUnreadMsg = ()=>req.get('/auth/user/unread')
 // 获取加入的群列表
 export const getCommunityList = ()=>req.get('/auth/relation/grouplist')
+// 注册用户
+export const register = (data:{name:string,password:string,identity:string})=>req.post('/new',data)

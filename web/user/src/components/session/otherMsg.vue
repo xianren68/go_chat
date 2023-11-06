@@ -7,15 +7,20 @@
             <span class="name" v-if="data.type != 1">
                 {{data.send_name}}
             </span>
-            <span class="msg">
+            <span class="msg" v-if="!data.md">
                 {{data.content}}
             </span>
+            <div class="md" v-else>
+                <previewmd  :text="data.content"></previewmd>
+            </div>
+            
         </div>
         
     </div>
 </template>
 
 <script setup lang="ts">
+import previewmd from './previewmd.vue'
 defineProps(['data'])
 </script>
 
@@ -57,6 +62,9 @@ defineProps(['data'])
                 font-size: 16px;
                 color: #000;
     
+            }
+            .md{
+                max-width: 100%;
             }
         }
 

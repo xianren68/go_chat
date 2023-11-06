@@ -1,8 +1,11 @@
 <template>
     <div class="me">
-        <span class="content">
+        <span class="content" v-if="!data.md">
             {{data.content}}
         </span>
+        <div class="md" v-else>
+            <previewmd  :text="data.content"></previewmd>
+        </div>
         <div class="avatar">
             <img src="../../assets/img/avatar.jpg" alt="">
         </div>
@@ -10,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import previewmd from './previewmd.vue'
 defineProps(['data'])
 </script>
 
@@ -32,6 +36,9 @@ defineProps(['data'])
             font-size: 16px;
             color: #fff;
 
+        }
+        .md {
+            max-width: 40%;
         }
         .avatar {
             width: 30px;

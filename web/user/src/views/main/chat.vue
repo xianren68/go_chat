@@ -10,9 +10,9 @@
         <!--发送消息-->
         <div class="send">
             <div class="send-main">
-                <div class="input">
-                    <svg class="icon">
-                        <use xlink:href="#icon-huatong"></use>
+                <div class="input" v-if="!md">
+                    <svg class="icon" @click="()=>{md = true;message = ''}">
+                        <use xlink:href="#icon-markdown"></use>
                     </svg>
                     <input v-model="message">
                     <svg class="icon" @click="emojiShow = !emojiShow" :class="{select_icon:emojiShow}">
@@ -22,6 +22,7 @@
                         <use xlink:href="#icon-attachment"></use>
                     </svg>
                 </div>
+                <MdEditor v-else v-model="message"></MdEditor>
                 <div class="send-icon" @click="sendMsg">
                     <svg class="icon">
                         <use xlink:href="#icon-send"></use>
@@ -30,7 +31,14 @@
             </div>
         </div>
     </div>
+    <!-- emoji组件 -->
     <Emoji v-if="emojiShow" @insertEmoji="insertEmoji"></Emoji>
+    <!-- 控制回到普通聊天框 -->
+    <div v-if="md" class="normal" @click="()=>{md = false;message=''}">
+        <svg class="icon">
+            <use xlink:href="#icon-chat"></use>
+        </svg>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -43,12 +51,16 @@ import { putSession, saveMessage } from "@/db"
 import { userStore } from "@/store"
 import { messageInt } from "@/type"
 import Emoji from "@/components/emoji.vue"
+import  {MdEditor}  from "md-editor-v3"
+import 'md-editor-v3/lib/style.css'
 // 获取会话信息
 const sessionStore = useSessionStore()
 const userstore = userStore()
 const messageStore = useMessageStore()
 // 控制表情是否展开
 const emojiShow = ref(false)
+// 控制markdown编辑器是否出现
+const md = ref(false)
 // 插入表情
 const insertEmoji = (arg:string)=>{
     message.value += arg
@@ -65,10 +77,10 @@ const sendMsg = () => {
     let send_msg: messageInt
     if(sessionStore.sessionList[0].type  == 1){
         // 私聊
-         send_msg = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name! }
+         send_msg = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,md:md.value }
     }else {
         // 群聊
-        send_msg = { from_id: userInfo.ID, target_id: 0, type: 2, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,group_id:sessionStore.sessionList[0].ID,group_avatar:sessionStore.sessionList[0].Avatar,group_name:sessionStore.sessionList[0].Name}
+        send_msg = { from_id: userInfo.ID, target_id: 0, type: 2, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,group_id:sessionStore.sessionList[0].ID,group_avatar:sessionStore.sessionList[0].Avatar,group_name:sessionStore.sessionList[0].Name,md:md.value}
     }
     
     messageStore.messageList.push(send_msg)
@@ -102,15 +114,13 @@ onMounted(() => {
 
     .top {
         height: 49px;
-        display: flex;
         border-bottom: #ccc 1px solid;
-        justify-content: center;
-        align-items: center;
+        text-align: center;
+        line-height: 49px;
         font-family: "Fira Code";
     }
 
     .main {
-        height: 75%;
         padding: 0 10px;
         padding-top: 20px;
         overflow: scroll;
@@ -121,8 +131,6 @@ onMounted(() => {
     }
 
     .send {
-        flex-grow: 1;
-
         .send-main {
             margin-top: 15px;
             display: flex;
@@ -153,6 +161,10 @@ onMounted(() => {
                     margin-left: 10px;
                 }
             }
+            .md-editor{
+                height: 250px;
+                width:655px;
+            }
 
             .send-icon {
                 height: 30px;
@@ -176,6 +188,15 @@ onMounted(() => {
     }
     .select_icon{
         fill: #4a499b;
+    }
+}
+.normal {
+    position: relative;
+    top:-22px;
+    left:60px;
+    .icon {
+        height: 20px;
+        width:20px;
     }
 }
 </style>

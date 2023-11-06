@@ -4,9 +4,9 @@ import { getEmojis } from '@/api'
 const emojis = defineStore("emojis",()=>{
     const emojilist:Array<string> = reactive([])
     const getEmojiList = async ()=>{
+        // emoji列表不存在时才请求
         if(emojilist.length == 0){
             const {data} = await getEmojis() as any
-            console.log(data)
             emojilist.push(...data.data)
         }
     }

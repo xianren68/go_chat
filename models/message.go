@@ -8,4 +8,5 @@ type Message struct {
 	Type     int    // 发送消息类型 （群发，私聊）
 	Content  string // 消息内容
 	SendTime int    // 发送时间
+	Md       bool   // 是否是markdown
 }

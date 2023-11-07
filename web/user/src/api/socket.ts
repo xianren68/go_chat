@@ -1,5 +1,5 @@
 import { insertData, putSession, saveMessage } from '@/db'
-import { useSessionStore, userStore, useMessageStore } from '@/store'
+import { useSessionStore, userStore, useMessageStore,useNoticeStore } from '@/store'
 import { messageInt} from '@/type'
 import { toRaw } from 'vue'
 import router from '@/router'
@@ -11,6 +11,7 @@ const socket = {
             // 获取token
             let token = localStorage.getItem('token')
             if (!token) {
+                router.push('/login')
                 return
             }
             this.s = new WebSocket('ws://localhost:9000/v1/chat', [token])
@@ -22,8 +23,9 @@ const socket = {
     // 接收消息
     receive() {
         const messageStore = useMessageStore()
-        const sessionStore = useSessionStore();
-        (this.s as WebSocket).onmessage = (event: any) => {
+        const sessionStore = useSessionStore()
+        const noticeStore = useNoticeStore();
+        this.s!.onmessage = (event: any) => {
             const userstore = userStore()
             const msg: string = event.data
             const val: messageInt = JSON.parse(msg)
@@ -31,6 +33,9 @@ const socket = {
             if (val.type > 2) {
                 userstore.unreadNotice = true
                 insertData(userstore.db!, 'unRead', val)
+                if(router.currentRoute.value.name == 'contact'){
+                    noticeStore.noticeList.push(val)
+                }
                 return
             }
             let index: number

@@ -30,7 +30,7 @@ onBeforeMount(async () => {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(to right, #093028, #237a57);
+    background: linear-gradient(to right, #005aa7, #fffde4)
   }
 
   main {

@@ -225,11 +225,33 @@ func GetUnread(c *gin.Context) {
 func getUnreadList(id uint) []string {
 	ctx := context.Background()
 	key := "list" + strconv.Itoa(int(id))
-	fmt.Println(key)
 	count, _ := global.RedisDB.LLen(ctx, key).Result()
 	result, err := global.RedisDB.LPopCount(ctx, key, int(count)).Result()
 	if err != nil {
 		zap.S().Info(err)
 	}
 	return result
+}
+
+// FindUserByName 通过用户名查找用户
+func FindUserByName(c *gin.Context) {
+	value := c.Query("name")
+	if value == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "failed to get name",
+		})
+		return
+	}
+	user, code := dao.FindUserByName(value)
+	if code != 0 {
+		common.ErrReply(c, code)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "ok",
+		"data": user,
+	})
+
 }

@@ -32,7 +32,16 @@ func FriendList(c *gin.Context) {
 func AddFriend(c *gin.Context) {
 	// 取出jwt中的id
 	value, _ := c.Get("userId")
-	name := c.PostForm("name")
+	x := make(map[string]string)
+	err := c.BindJSON(&x)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "参数错误",
+		})
+		return
+	}
+	name := x["name"]
 	if name == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 500,

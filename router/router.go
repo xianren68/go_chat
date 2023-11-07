@@ -28,6 +28,7 @@ func Router() *gin.Engine {
 		user.PUT("/update", service.UpdateUser)
 		user.GET("/unread", service.GetUnread)
 		user.GET("/emojis", service.GetEmoji)
+		user.GET("/findbyname", service.FindUserByName)
 	}
 	// 关系相关
 	relation := auth.Group("relation")
@@ -37,6 +38,7 @@ func Router() *gin.Engine {
 		relation.GET("/grouplist", service.GetGroupList)
 		relation.POST("/newgroup", service.NewGroup)
 		relation.POST("joingroup", service.JoinGroup)
+		relation.GET("/findgroupname", service.FindGroupByName)
 	}
 	return r
 }

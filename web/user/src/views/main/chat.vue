@@ -122,6 +122,7 @@ onMounted(() => {
 
     .main {
         padding: 0 10px;
+        flex-grow: 1;
         padding-top: 20px;
         overflow: scroll;
     }
@@ -151,6 +152,9 @@ onMounted(() => {
                     margin-left: 8px;
                     fill: #999;
                 }
+                .select_icon{
+                    fill:var(--icon-active-color);
+                  }
 
                 input {
                     width: 550px;
@@ -185,9 +189,6 @@ onMounted(() => {
 
         }
 
-    }
-    .select_icon{
-        fill: #4a499b;
     }
 }
 .normal {

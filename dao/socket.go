@@ -128,10 +128,9 @@ func disPatch(data []byte) {
 		// 群聊
 	case 2:
 		sendGroup(msg.FromId, msg.GroupId, data)
-	case 3:
-	// 请求添加好友
-	case 4:
-		// 请求加入群聊
+		// 添加好友/群组的请求
+	default:
+		sendMsgAndSave(msg.TargetId, data)
 	}
 
 }

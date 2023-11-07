@@ -8,11 +8,11 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Aside: typeof import('./src/components/aside.vue')['default']
-    Emoij: typeof import('./src/components/emoij.vue')['default']
     Emoji: typeof import('./src/components/emoji.vue')['default']
+    Find: typeof import('./src/components/contact/find.vue')['default']
     List: typeof import('./src/components/contact/list.vue')['default']
-    Md: typeof import('./src/components/md.vue')['default']
     MeMsg: typeof import('./src/components/session/meMsg.vue')['default']
+    Noticelist: typeof import('./src/components/contact/noticelist.vue')['default']
     OtherMsg: typeof import('./src/components/session/otherMsg.vue')['default']
     Previewmd: typeof import('./src/components/session/previewmd.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

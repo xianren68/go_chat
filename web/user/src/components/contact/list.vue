@@ -53,6 +53,11 @@ defineEmits()
       .line{
         font-size: 10px;
         color:#aaa;
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
+
+        overflow: hidden;
       }
     }
   }

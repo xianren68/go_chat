@@ -94,3 +94,12 @@ func JoinCommunity(userId uint, groupName string) (code int) {
 	}
 	return
 }
+
+// FindGroupByName 通过群名获取群
+func FindGroupByName(name string) (group *models.Community, code int) {
+	group = &models.Community{}
+	if tx := global.DB.Where("name= ?", name).First(group); tx.RowsAffected == 0 {
+		code = 2004
+	}
+	return
+}

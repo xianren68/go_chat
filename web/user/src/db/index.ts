@@ -73,7 +73,7 @@ export function putSession(db: IDBDatabase, tableName: string, data: sessionInt)
 // 判断是否有未读通知
 export function isExistNotify(db: IDBDatabase): Promise<boolean> {
     return new Promise((resolve) => {
-        const store = db.transaction(['message'], 'readonly').objectStore('message')
+        const store = db.transaction(['unRead'], 'readonly').objectStore('unRead')
         const request = store.openCursor()
         request.onsuccess = () => {
             let cursor = request.result
@@ -180,4 +180,42 @@ export function getGroupUnRead(db:IDBDatabase,group_id:number):Promise<Array<mes
         }
         
     })
+}
+// 获取通知数据
+export function getNotice(db:IDBDatabase):Promise<Array<messageInt>>{
+    return new Promise((resolve)=>{
+        let data:Array<messageInt> = []
+        const store  = db.transaction(['unRead'],'readwrite').objectStore('unRead')
+        const request = store.openCursor()
+        request.onsuccess = ()=>{
+            const cursor = request.result
+            if(cursor){
+                if(cursor.value.type > 2){
+                    data.push(cursor.value)
+                }
+                cursor.continue()
+            }else{
+                resolve(data)
+            }
+        }
+})
+}
+// 删除一条通知
+export function deleteNotice(db:IDBDatabase,msg:messageInt){
+        const store  = db.transaction(['unRead'],'readwrite').objectStore('unRead')
+        const request = store.openCursor()
+        request.onsuccess = ()=>{
+            const cursor = request.result
+            if(cursor){
+                let d = cursor.value
+                if(msg.type == 3 && d.type==3 && d.from_id == msg.from_id && d.target_id == msg.target_id){
+                    cursor.delete()
+                    return
+                }else if(msg.type == 4 && d.type==4 && d.from_id == msg.from_id && d.target_id == msg.target_id && d.group_id == msg.group_id) {
+                    cursor.delete()
+                    return
+                }
+                cursor.continue()
+            }
+        }
 }

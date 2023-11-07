@@ -3,18 +3,23 @@
   <div class="left">
     <!--    搜索-->
     <div class="top">
-      <div class="search" @click="()=>{isShow = !isShow}">
-        <svg class="icon">
-          <use xlink:href="#icon-sousuo"></use>
+      <div class="search" @click="()=>{isShow = !isShow;searchShow=false;search=''}">
+        <svg class="icon" :class="{select_icon:isShow}">
+          <use xlink:href="#icon-jiahao_o"></use>
         </svg>
       </div >
-      <input type="text" v-show="isShow" class="search-input" placeholder="查看用户/群组">
-      <div class="cancel" v-show="isShow">
+      <input type="text" v-show="isShow" class="search-input" placeholder="添加用户/群组" v-model="search"
+      @keyup.enter="searchEnter">
+      <div class="cancel" v-show="isShow" @click="search=''">
         <svg class="icon">
           <use xlink:href="#icon-quxiao"></use>
         </svg>
       </div>
     </div>
+    <!-- 添加用户/群组 -->
+    <findVue v-if="searchShow" :data="searchData" v-model="searchShow"></findVue> 
+    <!-- 通知列表 -->
+    <noticelist v-if="noticeStore.noticeList.length>0"></noticelist>
     <!--    切换群组/好友-->
     <div class="switch">
       <div class="friend" :class="{select:switchCt}" @click="switchFriend">好友</div>
@@ -30,13 +35,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref} from 'vue'
+import { ref,reactive} from 'vue'
 import {useContactStore} from "../../store"
 import {onBeforeMount,watch} from "vue"
 import List from '@/components/contact/list.vue'
 import UserInfo from "@/components/contact/userInfo.vue"
 import {useRouter} from 'vue-router'
+import findVue from '@/components/contact/find.vue'
+import { getUserByName,getCommunityByName } from '@/api'
+import { ElMessage } from 'element-plus'
+import noticelist from '@/components/contact/noticelist.vue'
+import { useNoticeStore } from '../../store'
 const router = useRouter()
+const noticeStore = useNoticeStore()
 // 控制搜索框是否显示
 const isShow = ref(false)
 // 控制选择好友还是群组
@@ -51,7 +62,6 @@ const jumpSession = (index:number)=>{
 // 监听索引的变化
 watch(selectIndex,(newSelect)=>{
   // 如果在群聊列表，直接跳转
-  console.log(switchCt.value);
   
   if(!switchCt.value){
     jumpSession(newSelect)
@@ -62,6 +72,8 @@ const contactStore = useContactStore()
 // 切换到用户列表
 const switchFriend = ()=>{
   switchCt.value = true
+  searchShow.value = false
+  search.value = ""
 }
 // 切换到群组列表
 const switchGroup = ()=>{
@@ -69,6 +81,42 @@ const switchGroup = ()=>{
   if(contactStore.groupList.length == 0){
     contactStore.getGroupList()
   }
+  searchShow.value = false
+  search.value = ""
+}
+// 搜索数据
+const search = ref("")
+// 控制搜索数据的显示与隐藏
+const searchShow = ref(false)
+// 搜索获取到的数据
+const searchData = reactive<any>({})
+// 搜索数据
+const searchEnter = async ()=>{
+  if(search.value == ""){
+    return
+  }
+  let res:any
+  if (switchCt.value){
+    if (contactStore.contactPerson.find(item=>item.Name==search.value)){
+      ElMessage.error("已存在该好友")
+      return
+    }
+    res = await getUserByName(search.value)
+  }else {
+    if (contactStore.groupList.find(item=>item.Name==search.value)){
+      ElMessage.error("已加入该群组")
+      return
+    }
+    res = await getCommunityByName(search.value)
+  }
+  let data = res.data
+  if(data.code != 0){
+    ElMessage.error(data.msg)
+    return
+  }
+  Object.assign(searchData,data.data)
+  searchData.isUser = switchCt.value
+  searchShow.value = true
 }
 // 挂载之前，获取用户列表
 onBeforeMount(()=>{
@@ -76,6 +124,8 @@ onBeforeMount(()=>{
   if(contactStore.contactPerson.length == 0){
     contactStore.getFriendList()
   }
+  // 获取未读通知
+  noticeStore.getNoticeList()
 })
 </script>
 
@@ -97,9 +147,6 @@ onBeforeMount(()=>{
       .search{
         width: 20px;
         height: 20px;
-        border-radius: 50%;
-        background-color: #f5f4fa;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -107,6 +154,9 @@ onBeforeMount(()=>{
           width: 15px;
           height: 15px;
           fill: #bbb;
+        }
+        .select_icon{
+          fill:var(--icon-active-color);
         }
       }
       .search-input{

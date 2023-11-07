@@ -65,16 +65,25 @@ func GetGroupList(c *gin.Context) {
 
 // JoinGroup 加入群聊
 func JoinGroup(c *gin.Context) {
-	value, _ := c.Get("userId")
-	name := c.PostForm("groupName")
+	info := make(map[string]any)
+	err := c.BindJSON(&info)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"code": 500,
+			"msg":  "参数错误",
+		})
+		return
+	}
+	name := info["name"].(string)
+	id := uint(info["id"].(float64))
 	if name == "" {
 		c.JSON(200, gin.H{
-			"code": -1,
+			"code": 500,
 			"msg":  "群名称不能为空",
 		})
 		return
 	}
-	code := dao.JoinCommunity(value.(uint), name)
+	code := dao.JoinCommunity(id, name)
 	if code != 0 {
 		//c.JSON(http.StatusOK, gin.H{
 		//	"code": -1,
@@ -84,4 +93,26 @@ func JoinGroup(c *gin.Context) {
 		return
 	}
 	common.OkReply(c)
+}
+
+// FindGroupByName 通过群名获取群信息
+func FindGroupByName(c *gin.Context) {
+	value := c.Query("name")
+	if value == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "failed to get name",
+		})
+		return
+	}
+	group, code := dao.FindGroupByName(value)
+	if code != 0 {
+		common.ErrReply(c, code)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "ok",
+		"data": group,
+	})
+
 }

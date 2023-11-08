@@ -19,3 +19,12 @@ export const getCommunityByName = (name:string)=>req.get(`/auth/relation/findgro
 export const newFriend = (data :{name:string})=>req.post('/auth/relation/addfriend',data)
 // 加入群聊
 export const joinCommunity = (data :{name:string,id:number})=>req.post('/auth/relation/joingroup',data)
+// 上传图片
+export const uploadImage = (data:FormData)=>req({
+    method:'post',
+    url:'/auth/user/uploadimg',
+    data:data,
+    headers:{
+        'Content-Type':'multipart/form-data'
+    }
+})

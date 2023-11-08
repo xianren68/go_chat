@@ -29,6 +29,7 @@ func Router() *gin.Engine {
 		user.GET("/unread", service.GetUnread)
 		user.GET("/emojis", service.GetEmoji)
 		user.GET("/findbyname", service.FindUserByName)
+		user.POST("/uploadimg", service.UpdateImg)
 	}
 	// 关系相关
 	relation := auth.Group("relation")

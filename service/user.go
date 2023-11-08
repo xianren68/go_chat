@@ -11,6 +11,7 @@ import (
 	"go_chat/global"
 	"go_chat/middleware"
 	"go_chat/models"
+	"go_chat/upload"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -30,7 +31,7 @@ func List(ctx *gin.Context) {
 // Login 登录
 func Login(ctx *gin.Context) {
 	info := make(map[string]string)
-	ctx.BindJSON(&info)
+	_ = ctx.BindJSON(&info)
 	name, pwd := info["name"], info["password"]
 	if name == "" || pwd == "" {
 		ctx.JSON(200, gin.H{
@@ -177,6 +178,34 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 	common.OkReply(ctx)
+}
+
+// UpdateImg 更新头像
+func UpdateImg(ctx *gin.Context) {
+	id, _ := ctx.Get("userId")
+	Id := id.(uint)
+	file, fileHeader, _ := ctx.Request.FormFile("file")
+	// 获取文件长度
+	fileSize := fileHeader.Size
+	url, code := upload.UploadImg(file, fileSize)
+	if code != 0 {
+		common.ErrReply(ctx, code)
+		return
+	}
+	user := &models.UserBasic{}
+	user.ID = Id
+	user.Avatar = url
+	// 更新用户信息
+	code = dao.UpdateUser(user)
+	if code != 0 {
+		common.ErrReply(ctx, code)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  "ok",
+		"data": url,
+	})
 }
 
 // DeleteUser 注销账号

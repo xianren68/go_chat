@@ -18,6 +18,7 @@ func InitConfig() {
 	serviceCfg.Port = cfg.Section("").Key("port").String()
 	serviceCfg.Mysql = initMysql(cfg)
 	serviceCfg.Redis = initRedis(cfg)
+	serviceCfg.QiNiuConfig = initQiNiu(cfg)
 	global.ServiceConfig = serviceCfg
 }
 
@@ -38,4 +39,15 @@ func initRedis(cfg *ini.File) *config.RedisConfig {
 	redisConfig.Host = cfg.Section("redis").Key("host").String()
 	redisConfig.Port = cfg.Section("redis").Key("port").String()
 	return redisConfig
+}
+
+// 初始化七牛云配置
+func initQiNiu(cfg *ini.File) *config.QiNiuConfig {
+	qiniuConfig := &config.QiNiuConfig{}
+	qiniuConfig.Zone = cfg.Section("qiniu").Key("Zone").MustInt(1)
+	qiniuConfig.AccessKey = cfg.Section("qiniu").Key("AccessKey").String()
+	qiniuConfig.SecretKey = cfg.Section("qiniu").Key("SecretKey").String()
+	qiniuConfig.Bucket = cfg.Section("qiniu").Key("Bucket").String()
+	qiniuConfig.QiniuServer = cfg.Section("qiniu").Key("QiniuServer").String()
+	return qiniuConfig
 }

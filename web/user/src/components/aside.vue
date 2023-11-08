@@ -1,7 +1,7 @@
 <template>
     <div class="aside">
-        <div class="avatar">
-            <img src="../assets/img/avatar.jpg" alt="">
+        <div class="avatar" @click="router.push({name:'user'})">
+            <img :src="userstore.userInfo!.Avatar" alt="">
         </div>
         <a class="item" @click="message" :class="{select:router.currentRoute.value.name == 'session'||router.currentRoute.value.name == 'chat' }">
             <svg class="icon">

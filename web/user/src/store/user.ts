@@ -5,21 +5,16 @@ const user = defineStore('user',()=>{
     const unreadNotice = ref(false)
     const unreadMessage = ref(0)
     const db = ref<IDBDatabase>()
-    let userInfo:userInt|undefined
+    let userInfo = ref<userInt|null>()
     // 登录时
     const update = (data:userInt)=>{
-        userInfo = data
+        userInfo.value = data
         localStorage.setItem('userInfo',JSON.stringify(data))
     }
     // 获取
     const getUser = ()=>{
-        if(userInfo){
-            return userInfo
-        }else{
-            userInfo = JSON.parse(localStorage.getItem('userInfo') || '')
-            return userInfo
-        }
+        userInfo.value = JSON.parse(localStorage.getItem('userInfo') || 'null')
     }
-    return {update,getUser,unreadMessage,unreadNotice,db}
+    return {update,getUser,unreadMessage,unreadNotice,db,userInfo}
 })
 export default user

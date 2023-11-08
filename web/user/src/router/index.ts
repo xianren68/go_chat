@@ -24,6 +24,11 @@ const routes = [
                             component:() => import('@/views/main/chat.vue')
                         }
                     ]
+                },
+                {
+                    name:"user",
+                    path:"user",
+                    component:()=>import('@/views/main/homePage.vue')
                 }
             ]
 

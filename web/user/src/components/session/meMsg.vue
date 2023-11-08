@@ -7,13 +7,15 @@
             <previewmd  :text="data.content"></previewmd>
         </div>
         <div class="avatar">
-            <img src="../../assets/img/avatar.jpg" alt="">
+            <img :src="userstore.userInfo!.Avatar" alt="">
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import previewmd from './previewmd.vue'
+import {userStore} from '@/store'
+const userstore = userStore()
 defineProps(['data'])
 </script>
 

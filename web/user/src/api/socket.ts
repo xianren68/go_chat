@@ -78,6 +78,14 @@ const socket = {
                     sessionStore.sessionList[index].unReadCount++
                 }
             }
+            // 防止修改头像和名称
+            if(val.type == 1){
+                sessionStore.sessionList[index].Name = val.send_name
+                sessionStore.sessionList[index].Avatar = val.avatar
+            }else{
+                sessionStore.sessionList[index].Name = val.group_name!
+                sessionStore.sessionList[index].Avatar = val.group_avatar!
+            }
 
             // 存储会话
             putSession(userstore.db as IDBDatabase, val.type == 1 ? 'usersession' : 'groupsession', toRaw(sessionStore.sessionList[index]))

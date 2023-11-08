@@ -35,6 +35,9 @@ export async function init() {
           userSession.lastMsg = value.content
           userSession.lastMsgTime = value.send_time
           userSession.unReadCount ? userSession.unReadCount++ : userSession.unReadCount = 1
+                    // 可能会修改头像和名称
+                    if(value.avatar!==userSession.Avatar){userSession.Avatar = value.avatar!}
+                    if(value.send_name!==userSession.Name){userSession.Name = value.send_name!}
         } else {
           userSession = {
             ID: value.from_id, Name: value.send_name, Avatar: value.avatar,
@@ -55,6 +58,9 @@ export async function init() {
           groupSession.lastMsg = value.content
           groupSession.lastMsgTime = value.send_time
           groupSession.unReadCount ? groupSession.unReadCount++ : groupSession.unReadCount = 1
+          // 可能会修改头像和名称
+          if(value.group_avatar!==groupSession.Avatar){groupSession.Avatar = value.group_avatar!}
+          if(value.group_name!==groupSession.Name){groupSession.Name = value.group_name!}
         } else {
           groupSession = {
             ID: value.group_id!, Name: value.group_name!, Avatar: value.group_avatar!,

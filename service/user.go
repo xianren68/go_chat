@@ -12,6 +12,7 @@ import (
 	"go_chat/middleware"
 	"go_chat/models"
 	"go_chat/upload"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -295,6 +296,7 @@ func FindUserByName(c *gin.Context) {
 func SendVerify(c *gin.Context) {
 	info := make(map[string]string)
 	_ = c.BindJSON(&info)
+	fmt.Println(info)
 	email := info["email"]
 	user, code := dao.FindUserByEmail(email)
 	if code != 0 {
@@ -303,9 +305,13 @@ func SendVerify(c *gin.Context) {
 	}
 	// 生成六位验证码
 	verifyCode := common.GenValidateCode(6)
+	var ver any = verifyCode
 	ctx := context.Background()
 	// 将email与验证码存进redis
-	global.RedisDB.Set(ctx, email, verifyCode, 5*time.Second)
+	_, err := global.RedisDB.Set(ctx, email, ver, 300*time.Second).Result()
+	if err != nil {
+		log.Println(err)
+	}
 	// 发送邮箱验证码
 	common.SendEmail(verifyCode, global.ServiceConfig.Email, email, global.ServiceConfig.EmailCode)
 	c.JSON(http.StatusOK, gin.H{
@@ -315,7 +321,46 @@ func SendVerify(c *gin.Context) {
 	})
 }
 
-// 验证码校验
+// VerifyCode 验证码校验,并保存密码
+func VerifyCode(c *gin.Context) {
+	info := make(map[string]string)
+	_ = c.BindJSON(&info)
+	email := info["email"]
+	code := info["code"]
+	// 取出对应的值从redis中
+	result, err := global.RedisDB.Get(context.Background(), email).Result()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "验证码已过期",
+		})
+		return
+	}
+
+	if result != code {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "验证码错误",
+		})
+		return
+	}
+	// 对密码进行重新加密
+	id := info["id"]
+	password := info["password"]
+	Id, _ := strconv.Atoi(id)
+	user := &models.UserBasic{}
+	user.ID = uint(Id)
+
+	salt := fmt.Sprintf("%d", rand.Int31())
+	user.Salt = salt
+	user.PassWord = common.SaltPassword(password, salt)
+	// 更新
+	dao.UpdateUser(user)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "ok",
+	})
+}
 
 // 获取redis未读消息列表
 func getUnreadList(id uint) []string {

@@ -52,11 +52,11 @@ const images = ["http://s3sk3sf71.hb-bkt.clouddn.com/IMG_20231109_170634.png",
     .carsouel {
       position: absolute;
       top:100px;
-      left: 100px;
+      left: 98px;
       height: 60%;
       width: 80%;
       img{
-        width: 100%;
+        width: 101%;
       }
     }
 

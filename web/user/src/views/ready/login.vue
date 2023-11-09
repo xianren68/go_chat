@@ -23,7 +23,7 @@
             同意协议
           </span>
         </span>
-        <span class="forget">
+        <span class="forget" @click="router.push({name:'repassword'})">
           忘记密码
         </span>
       </div>

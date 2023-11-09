@@ -49,6 +49,11 @@ const routes = [
                 component:()=> import('@/views/ready/register.vue')
             }
         ]
+    },
+    {
+        path:'/rePassword',
+        name:"repassword",
+        component:()=>import('@/views/rePassword.vue')
     }
 ]
 const router = createRouter({
@@ -58,8 +63,11 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to) => {
     let token = localStorage.getItem("token")
-    if (!token && to.name != 'login' && to.name != 'register') {
+    if (!token && to.name != 'login' && to.name != 'register' && to.name != 'repassword') {
         return {name: 'login'}
+    }
+    if(to.path.startsWith("/ready")){
+        return {name:'/'}
     }
 })
 

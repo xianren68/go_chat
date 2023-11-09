@@ -30,3 +30,7 @@ export const uploadImage = (data:FormData)=>req({
 })
 // 更新用户信息
 export const updateUserInfo = (data:any)=>req.put('/auth/user/update',data)
+// 发送验证码
+export const sendVerify = (data:{email:string})=>req.post('/sendverify',data)
+// 修改密码
+export const verfiyCode = (data:{email:string,code:string,password:string,id:string})=>req.post('/verifycode',data)

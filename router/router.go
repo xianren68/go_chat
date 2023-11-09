@@ -17,6 +17,8 @@ func Router() *gin.Engine {
 	v1.GET("/chat", service.SendUserMsg)
 	v1.POST("/login", service.Login)
 	v1.POST("/new", service.NewUser)
+	v1.POST("/sendverify", service.SendVerify)
+	v1.POST("/verifycode", service.VerifyCode)
 	// 鉴权
 	auth := v1.Group("auth")
 	auth.Use(middleware.Jwt())

@@ -77,10 +77,25 @@
                 </div>
               </div>
           </div>
-      <div class="more">
+      <div class="more" @click="optionShow = !optionShow">
         <svg class="icon">
           <use xlink:href="#icon-gengduo"></use>
         </svg>
+      </div>
+    </div>
+    <div class="option" v-if="optionShow">
+      <div class="arrow"></div>
+      <div class="item">
+        <svg class="icon">
+          <use xlink:href="#icon-tuichu"></use>
+        </svg>
+        <span>退出登录</span>
+      </div>
+      <div class="item">
+        <svg class="icon">
+          <use xlink:href="#icon-bianji"></use>
+        </svg>
+        <span>修改密码</span>
       </div>
     </div>
 </template>
@@ -219,16 +234,22 @@ const submit = async (t:number,val:string) => {
   ElMessage.success("修改成功")
   userstore.update(null)
 }
+// 操作是否出现
+const optionShow = ref(false)
 </script>
 
 <style scoped lang="scss">
   .info {
     flex-grow: 1;
-    display: flex;
     height: 100%;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     .main {
+      position:absolute;
+      top:0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin:auto;
       display: flex;
       height: 60%;
       width: 60%;
@@ -307,11 +328,37 @@ const submit = async (t:number,val:string) => {
     }
     .more{
       position: relative;
-      top:-120px;
-      left:-30px;
+      top:120px;
+      left:720px;
       .icon{
         height: 20px;
         width: 20px;
+      }
+    }
+  }
+  .option{
+    position: relative;
+    height: 50px;
+    top:115px;
+    left: -186px;
+    background-color: #fff;
+    padding: 5px 10px;
+    .arrow {
+      position: absolute;
+      top:18px;
+      left:-25px;
+      border:15px solid rgba(0,0,0,0);
+      border-right:15px solid #fff ;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      margin-top: 5px;
+      .icon{
+        height: 15px;
+        width: 15px;
+        margin-right: 10px;
       }
     }
   }

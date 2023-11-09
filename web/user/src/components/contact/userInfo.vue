@@ -4,6 +4,14 @@
             <div class="avatar">
               <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU" alt="">
             </div>
+            <div class="gender">
+              <svg class="icon" v-if="information.gender == 'female'">
+                <use xlink:href="#icon-xingbie-nv"></use>
+              </svg>
+              <svg class="icon" v-else>
+                <use xlink:href="#icon-xingbie-nan"></use>
+              </svg>
+            </div>
             <p class="line">{{information.Line}}</p>
             <div class="contact">
                 <svg class="icon">
@@ -74,8 +82,19 @@ const jumpMsg = (ID:number,Name:string,Avatar:string)=>{
           width: 100%;
         }
       }
+      .gender {
+        position: relative;
+        height: 20px;
+        width: 20px;
+        left:29px;
+        top:-18px;
+        .icon {
+          height: 20px;
+          width: 20px;
+        }
+      }
       .line{
-        margin:18px 0;
+        margin-bottom: 18px;
         font-weight: bold;
         font-family: "Fira Code Light";
         font-style: italic;

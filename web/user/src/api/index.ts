@@ -28,3 +28,5 @@ export const uploadImage = (data:FormData)=>req({
         'Content-Type':'multipart/form-data'
     }
 })
+// 更新用户信息
+export const updateUserInfo = (data:any)=>req.put('/auth/user/update',data)

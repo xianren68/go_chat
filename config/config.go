@@ -13,6 +13,8 @@ type MysqlConfig struct {
 // ServiceConfig 服务器相关配置
 type ServiceConfig struct {
 	Port        string // 服务器开启的端口
+	EmailCode   string // 邮箱授权码
+	Email       string // 邮箱账号
 	Mysql       *MysqlConfig
 	Redis       *RedisConfig
 	QiNiuConfig *QiNiuConfig

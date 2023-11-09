@@ -140,6 +140,8 @@ func NewUser(ctx *gin.Context) {
 
 // UpdateUser 更新用户信息
 func UpdateUser(ctx *gin.Context) {
+	id, _ := ctx.Get("userId")
+	Id := id.(uint)
 	user := &models.UserBasic{}
 	err := ctx.BindJSON(user)
 	if err != nil {
@@ -150,8 +152,12 @@ func UpdateUser(ctx *gin.Context) {
 		})
 		return
 	}
-	// 判断要更新的用户名是否已经存在
-	code := dao.UserExist(user.Name)
+	user.ID = Id
+	var code = 0
+	// 判断是否有更新用户名，且用户名是否已存在
+	if user.Name != "" {
+		code = dao.UserExist(user.Name)
+	}
 	if code != 0 {
 		//ctx.JSON(200, gin.H{
 		//	"code": -1,
@@ -160,13 +166,25 @@ func UpdateUser(ctx *gin.Context) {
 		common.ErrReply(ctx, code)
 		return
 	}
-	// 如果存在密码的改变，继续加密
-	if user.PassWord != "" {
-		salt := fmt.Sprintf("%d", rand.Int31())
-		pwd := common.SaltPassword(user.PassWord, salt)
-		user.PassWord = pwd
-		user.Salt = salt
+	fmt.Println(user)
+	// 判断是否有邮箱修改，判断邮箱是否存在
+	if user.Email != "" {
+		_, code = dao.FindUserByEmail(user.Email)
+		if code == 0 {
+			common.ErrReply(ctx, 1011)
+			return
+		}
 	}
+
+	// 判断是否有号码修改
+	if user.Phone != "" {
+		_, code = dao.FindUserByPhone(user.Phone)
+		if code == 0 {
+			common.ErrReply(ctx, 1012)
+			return
+		}
+	}
+
 	// 更新
 	code = dao.UpdateUser(user)
 	if code != 0 {
@@ -250,18 +268,6 @@ func GetUnread(c *gin.Context) {
 	})
 }
 
-// 获取redis未读消息列表
-func getUnreadList(id uint) []string {
-	ctx := context.Background()
-	key := "list" + strconv.Itoa(int(id))
-	count, _ := global.RedisDB.LLen(ctx, key).Result()
-	result, err := global.RedisDB.LPopCount(ctx, key, int(count)).Result()
-	if err != nil {
-		zap.S().Info(err)
-	}
-	return result
-}
-
 // FindUserByName 通过用户名查找用户
 func FindUserByName(c *gin.Context) {
 	value := c.Query("name")
@@ -283,4 +289,42 @@ func FindUserByName(c *gin.Context) {
 		"data": user,
 	})
 
+}
+
+// SendVerify 忘记密码，发送邮箱验证
+func SendVerify(c *gin.Context) {
+	info := make(map[string]string)
+	_ = c.BindJSON(&info)
+	email := info["email"]
+	user, code := dao.FindUserByEmail(email)
+	if code != 0 {
+		common.ErrReply(c, code)
+		return
+	}
+	// 生成六位验证码
+	verifyCode := common.GenValidateCode(6)
+	ctx := context.Background()
+	// 将email与验证码存进redis
+	global.RedisDB.Set(ctx, email, verifyCode, 5*time.Second)
+	// 发送邮箱验证码
+	common.SendEmail(verifyCode, global.ServiceConfig.Email, email, global.ServiceConfig.EmailCode)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "验证码已发送请在5分钟内完成填写",
+		"Id":   user.ID,
+	})
+}
+
+// 验证码校验
+
+// 获取redis未读消息列表
+func getUnreadList(id uint) []string {
+	ctx := context.Background()
+	key := "list" + strconv.Itoa(int(id))
+	count, _ := global.RedisDB.LLen(ctx, key).Result()
+	result, err := global.RedisDB.LPopCount(ctx, key, int(count)).Result()
+	if err != nil {
+		zap.S().Info(err)
+	}
+	return result
 }

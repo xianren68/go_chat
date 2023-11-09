@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import asideVue from '@/components/aside.vue'
 import { onBeforeMount} from 'vue'
-import {init} from '@/hooks/init'
+import {init} from '@/utils/init'
 onBeforeMount(async () => {
   // 初始化 socket连接，数据库连接
   await init()
@@ -49,4 +49,4 @@ onBeforeMount(async () => {
     background-color: #f9f9fd;
   }
 }
-</style>
+</style>@/utils/init

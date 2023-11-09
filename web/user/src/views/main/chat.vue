@@ -3,7 +3,7 @@
         <div class="top">{{ sessionStore.sessionList[0].Name }}</div>
         <div class="main" ref="main">
             <div v-for="item in messageStore.messageList">
-                <meMsg :data="item" v-if="item.from_id === userstore.getUser()?.ID"></meMsg>
+                <meMsg :data="item" v-if="item.from_id === userstore.userInfo!.ID"></meMsg>
                 <otherMsg :data="item" v-else></otherMsg>
             </div>
         </div>
@@ -77,10 +77,10 @@ const sendMsg = () => {
     let send_msg: messageInt
     if(sessionStore.sessionList[0].type  == 1){
         // 私聊
-         send_msg = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,md:md.value }
+         send_msg = { from_id: userInfo.ID, target_id: sessionStore.sessionList[0].ID, type: 1, content: message.value, send_time: nowData, avatar: userstore.userInfo!.Avatar, send_name: userstore.userInfo!.Name,md:md.value }
     }else {
         // 群聊
-        send_msg = { from_id: userInfo.ID, target_id: 0, type: 2, content: message.value, send_time: nowData, avatar: userstore.getUser()?.Avatar!, send_name: userstore.getUser()?.Name!,group_id:sessionStore.sessionList[0].ID,group_avatar:sessionStore.sessionList[0].Avatar,group_name:sessionStore.sessionList[0].Name,md:md.value}
+        send_msg = { from_id: userInfo.ID, target_id: 0, type: 2, content: message.value, send_time: nowData, avatar: userstore.userInfo!.Avatar, send_name: userstore.userInfo!.Name,group_id:sessionStore.sessionList[0].ID,group_avatar:sessionStore.sessionList[0].Avatar,group_name:sessionStore.sessionList[0].Name,md:md.value}
     }
     
     messageStore.messageList.push(send_msg)

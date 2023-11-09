@@ -16,6 +16,9 @@ func InitConfig() {
 	// 创建服务器配置
 	serviceCfg := &config.ServiceConfig{}
 	serviceCfg.Port = cfg.Section("").Key("port").String()
+	serviceCfg.EmailCode = cfg.Section("").Key("emailCode").String()
+	serviceCfg.Email = cfg.Section("").Key("email").String()
+
 	serviceCfg.Mysql = initMysql(cfg)
 	serviceCfg.Redis = initRedis(cfg)
 	serviceCfg.QiNiuConfig = initQiNiu(cfg)

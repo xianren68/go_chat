@@ -20,6 +20,8 @@ const (
 	ErrorTokenTypeWrong  = 1008
 	IsSameUser           = 1009
 	RepeatAddFriend      = 1010
+	ErrorEmailExist      = 1011
+	ErrorPhoneExist      = 1012
 	ErrorGroupExist      = 2001
 	ErrorRepeatJoinGroup = 2003
 	ErrorGroupNotExist   = 2004
@@ -38,6 +40,8 @@ var codeMsg = map[int]string{
 	ErrorTokenRuntime:    "token过期,请重新登录",
 	ErrorTokenTypeWrong:  "token格式有误,请重新登录",
 	IsSameUser:           "不能添加自己为好友",
+	ErrorEmailExist:      "此邮箱已被绑定",
+	ErrorPhoneExist:      "此号码已被绑定",
 	RepeatAddFriend:      "已存在此好友",
 	ErrorGroupExist:      "群组已存在",
 	ErrorRepeatJoinGroup: "不能重复加群",

@@ -10,7 +10,6 @@ export async function init() {
   // 建立socket链接
   socket.init()
   // 打开数据库连接
-  userstore.getUser()
   const db = await openDb((userstore.userInfo!.ID) + 'chat')
   userstore.db = db
   // 获取用户会话列表

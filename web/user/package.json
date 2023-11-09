@@ -15,7 +15,10 @@
     "nprogresse": "^0.2.6",
     "pinia": "^2.1.7",
     "pnpm": "^8.10.2",
+    "swiper": "6.5.6",
     "vue": "^3.3.4",
+    "vue-awesome-swiper": "^5.0.1",
+    "vue-easy-slider": "^5.3.4",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

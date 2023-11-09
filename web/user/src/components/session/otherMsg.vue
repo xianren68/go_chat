@@ -1,7 +1,7 @@
 <template>
     <div class="other">
         <div class="avatar">
-            <img :src="data.Avatar == '' ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU' : data.Avatar" alt="">
+            <img :src="data.avatar" alt="">
         </div>
         <div class="content">
             <span class="name" v-if="data.type != 1">
@@ -43,9 +43,10 @@ defineProps(['data'])
         }
         .content {
             max-width: 40%;
+            margin-left: 5px;
             .name {
                 display: block;
-                font-size:12px ;
+                font-size:10px ;
                 color: #aaa;
                 margin-bottom: 3px;
             }

@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onMounted } from "vue"
+import { ref, toRaw, onMounted} from "vue"
 import socket from "../../api/socket"
 import meMsg from "@/components/session/meMsg.vue"
 import otherMsg from "@/components/session/otherMsg.vue"
@@ -93,6 +93,7 @@ const sendMsg = () => {
     // 存储聊天
     saveMessage(userstore.db!, send_msg)
 }
+
 onMounted(() => {
     const observer = new MutationObserver((mutationList) => {
         // 监听子元素变化，以便让聊天随时处于可视区域内

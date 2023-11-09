@@ -35,7 +35,7 @@
               <svg class="icon">
                 <use xlink:href="#icon-xingbie"></use>
               </svg>
-              <span title="双击编辑" v-if="!sexShow" @dblclick="sexShow=true">{{userstore.userInfo!.Phone == ""?"未设置":userstore.userInfo!.Gender=="male"?"男":"女"}}</span>
+              <span title="双击编辑" v-if="!sexShow" @dblclick="sexShow=true">{{userstore.userInfo!.Name == ""?"未设置":userstore.userInfo!.Gender=="male"?"男":"女"}}</span>
               <div class="edit" v-else>
                 <input type="text" placeholder="请输入性别" v-model="sex" >
                 <svg class="icon" @click="submit(3,sex)">
@@ -154,7 +154,7 @@ const submit = async (t:number,val:string) => {
       }
       break
     case 2:
-      d.userName = val
+      d.Name = val
       res = await updateUserInfo(d)
       if (res.data.code === 0){
         userstore.userInfo!.Name = val

@@ -7,7 +7,7 @@
             <svg class="icon">
                 <use xlink:href="#icon-message"></use>
             </svg>
-            <p class="unreadMsg" v-if="userstore.unreadMessage>0">{{userstore.unreadMessage}}</p>
+            <p class="unreadMsg" v-if="userstore.unreadMessage>0">{{userstore.unreadMessage >= 100?"99+":userstore.unreadMessage}}</p>
         </a>
         <a class="item" @click="contact" :class="{select:router.currentRoute.value.name == 'contact'}">
             <svg class="icon">
@@ -73,22 +73,26 @@ const setting = ()=>{
         width: 20px;
         height: 20px;
     }
-    .unreadMsg {
+    .item {
         position: relative;
+    }
+    .unreadMsg {
+        position: absolute;
         text-align: center;
         font-size: 10px;
-        top:-29px;
+        width: 20px;
+        top:14px;
         left:13px;
         color: #fff;
         background-color: #fa5151;
         border-radius: 5px;
     }
     .unreadNotice{
-        position: relative;
+        position: absolute;
         width: 6px;
         height: 6px;
-        top:-26px;
-        left:18px;
+        top:18px;
+        left:16px;
         border-radius: 50%;
         background-color: #fa5151;
     }

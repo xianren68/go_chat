@@ -58,7 +58,7 @@ defineProps(['data'])
                 border-radius: 5px;
                 line-height: 30px;
                 padding: 0 4px;
-                background-color:#fcf;
+                background-color:#ccc;
                 font-family: fira code;
                 font-size: 16px;
                 color: #000;

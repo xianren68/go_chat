@@ -77,35 +77,37 @@
                 </div>
               </div>
           </div>
-      <div class="more" @click="optionShow = !optionShow">
+      <div class="more" @click="option">
         <svg class="icon">
           <use xlink:href="#icon-gengduo"></use>
         </svg>
       </div>
-    </div>
-    <div class="option" v-if="optionShow">
-      <div class="arrow"></div>
-      <div class="item">
-        <svg class="icon">
-          <use xlink:href="#icon-tuichu"></use>
-        </svg>
-        <span>退出登录</span>
+      <div class="option" v-if="optionShow" >
+        <div class="arrow"></div>
+        <div class="item" @click="logout">
+          <svg class="icon">
+            <use xlink:href="#icon-tuichu"></use>
+          </svg>
+          <span>退出登录</span>
+        </div>
+        <div class="item" @click="editPwd">
+          <svg class="icon">
+            <use xlink:href="#icon-bianji"></use>
+          </svg>
+          <span>修改密码</span>
+        </div>
       </div>
-      <div class="item">
-        <svg class="icon">
-          <use xlink:href="#icon-bianji"></use>
-        </svg>
-        <span>修改密码</span>
-      </div>
     </div>
+    
 </template>
 <script setup lang="ts">
 import {userStore} from '@/store'
 import {ref} from 'vue'
 import { uploadImage } from '@/api'
-import { ElMessage } from 'element-plus'
+import { ElMessage,ElMessageBox } from 'element-plus'
 import {isEmail,isMobile,isSex} from '@/utils/verify'
 import {updateUserInfo} from '@/api'
+import router from '@/router'
 const userstore = userStore()
 const fileRef = ref<HTMLInputElement>()
 // 修改头像
@@ -236,6 +238,35 @@ const submit = async (t:number,val:string) => {
 }
 // 操作是否出现
 const optionShow = ref(false)
+const option = ()=>{
+  optionShow.value = !optionShow.value
+}
+// 退出登录
+const logout = ()=>{
+  ElMessageBox.confirm('确定退出登录？', '提示',{
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+    }
+  ).then(()=>{
+    ElMessage.success("操作成功")
+    localStorage.clear()
+    router.push('/login')
+  })
+}
+// 修改密码
+const editPwd = ()=>{
+  if(userstore.userInfo!.Email === ''){
+    ElMessage.info("未绑定邮箱，暂时无法更改密码")
+    return
+  }
+  router.push({
+    name:'repassword',
+    query:{
+      email:userstore.userInfo!.Email
+    }
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -328,38 +359,44 @@ const optionShow = ref(false)
     }
     .more{
       position: relative;
+      width:5px;
       top:120px;
       left:720px;
+      z-index: 20;
       .icon{
         height: 20px;
         width: 20px;
       }
     }
-  }
-  .option{
-    position: relative;
-    height: 50px;
-    top:115px;
-    left: -186px;
-    background-color: #fff;
-    padding: 5px 10px;
-    .arrow {
-      position: absolute;
-      top:18px;
-      left:-25px;
-      border:15px solid rgba(0,0,0,0);
-      border-right:15px solid #fff ;
-    }
-    .item {
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      margin-top: 5px;
-      .icon{
-        height: 15px;
-        width: 15px;
-        margin-right: 10px;
+    .option{
+      z-index: 10;
+      position: relative;
+      height: 50px;
+      top:74px;
+      width: 100px;
+      left: 750px;
+      background-color: #fff;
+      padding: 5px 0 5px 10px;
+      border-radius: 5px;
+      .arrow {
+        position: absolute;
+        top:18px;
+        left:-25px;
+        border:15px solid rgba(0,0,0,0);
+        border-right:15px solid #fff ;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        margin-top: 5px;
+        .icon{
+          height: 15px;
+          width: 15px;
+          margin-right: 10px;
+        }
       }
     }
   }
+
 </style>

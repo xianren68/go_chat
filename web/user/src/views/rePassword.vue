@@ -3,7 +3,13 @@
         <div class="content">
             <p class="title">CHANGE</p>
             <div class="info">
-                <div class="email item">
+                <div class="query item" v-if="query">
+                    <svg class="icon">
+                        <use xlink:href="#icon-youxiang"></use>
+                    </svg>
+                    <div>{{email}}</div>
+                </div>
+                <div class="email item" v-else>
                     <svg class="icon">
                         <use xlink:href="#icon-youxiang"></use>
                     </svg>
@@ -24,7 +30,7 @@
                     <svg class="icon">
                         <use xlink:href="#icon-pwd"></use>
                     </svg>
-                    <input type="password" placeholder="密码" v-model="pwd">
+                    <input type="password" placeholder="新密码" v-model="pwd">
                     <span class="verify" v-show="verPwd">密码不能为空</span>
                 </div>
                 <div class="pwd item">
@@ -42,12 +48,13 @@
   
 <script setup lang="ts">
 
-import { ref } from 'vue'
-import { useRouter } from "vue-router"
+import { ref,onMounted } from 'vue'
+import { useRouter,useRoute} from "vue-router"
 import { ElMessage } from "element-plus"
 import { isEmail } from '@/utils/verify'
 import {sendVerify,verfiyCode} from '@/api'
 const router = useRouter()
+const route = useRoute()
 const email = ref("")
 const code = ref("")
 const pwd = ref("")
@@ -60,6 +67,8 @@ const emailShow = ref(false)
 const id = ref("")
 // 过期时间
 const times = ref(0)
+// 是否是修改密码
+const query = ref(false)
 // 发送验证码
 const sendCode = async () => {
     if (times.value > 0){
@@ -119,11 +128,21 @@ const submit = async () => {
     const {data} = await verfiyCode({email:email.value,code:code.value,password:pwd.value,id:id.value})
     if(data.code == 0){
         ElMessage.success(data.msg)
+        localStorage.clear()
         router.push('/login')
         return
     }
     ElMessage.error(data.msg)
 }
+onMounted(() => {
+    const qu:any = route.query
+    if(!qu){
+        return
+    }
+    query.value = true
+    email.value = qu.email
+
+})
 </script>
   
 <style lang="scss" scoped>
@@ -171,6 +190,13 @@ const submit = async () => {
             }
             .email {
                 margin-top: 50px;
+            }
+            .query{
+                margin-top: 50px;
+                div{
+                    margin-left: 5px;
+                    display: inline-block;
+                }
             }
             .code {
                 margin-top: 35px;

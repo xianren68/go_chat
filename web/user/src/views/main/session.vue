@@ -3,7 +3,8 @@
         <!--聊天用户列表-->
         <div class="list">
             <div class="item" v-for="(session, i) in sessionStore.sessionList" :key="i"
-                :class="{ select: route.name == 'chat' && i == 0 }" @click="switchSession(session.ID, session.type)">
+                :class="{ select: route.name == 'chat' && i == 0 }" @click="switchSession(session.ID, session.type)"
+                @mouseup.right="deleteSe($event,i)">
                 <div class="img">
                     <img :src="session.Avatar == '' ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU' : session.Avatar"
                         alt="">
@@ -28,10 +29,11 @@
 
 <script setup lang="ts">
 import { useSessionStore, useMessageStore, userStore } from "@/store"
-import { onBeforeMount,toRaw } from "vue"
+import { onBeforeMount, toRaw } from "vue"
 import { sessionInt } from "@/type"
 import { useRouter, useRoute } from "vue-router"
-import { putSession } from "@/db";
+import { putSession, deleteSession } from "@/db";
+import { ElMessageBox } from "element-plus";
 const sessionStore = useSessionStore()
 const messageStore = useMessageStore()
 const userstore = userStore()
@@ -40,12 +42,12 @@ const router = useRouter()
 // 转换时间戳
 const transformTime = (time: number): string => {
     const date = new Date(time)
-    const  minutes = date.getMinutes()
-    if(minutes-10 < 0){
-        return "" + date.getHours() + ":" + "0" +minutes
+    const minutes = date.getMinutes()
+    if (minutes - 10 < 0) {
+        return "" + date.getHours() + ":" + "0" + minutes
     }
-    return "" + date.getHours() + ":" +minutes
-    
+    return "" + date.getHours() + ":" + minutes
+
 }
 // 切换会话
 const switchSession = async (id: number, type: number) => {
@@ -59,8 +61,28 @@ const switchSession = async (id: number, type: number) => {
     userstore.unreadMessage -= unReadCount
     sessionStore.sessionList[0].unReadCount = 0
     // 更新会话
-    putSession(userstore.db!,sessionStore.sessionList[0].type == 1?"usersession":"groupsession",toRaw(sessionStore.sessionList[0]))
+    putSession(userstore.db!, sessionStore.sessionList[0].type == 1 ? "usersession" : "groupsession", toRaw(sessionStore.sessionList[0]))
     router.push({ name: 'chat' })
+}
+// 删除会话
+const deleteSe = (e:Event,index: number) => {
+    e.preventDefault()
+    ElMessageBox.confirm('确定要删除该会话吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+    }).then(() => {
+        if (sessionStore.sessionList[index].type == 1) {
+            deleteSession(userstore.db!, 'usersession', sessionStore.sessionList[index].ID)
+        } else {
+            deleteSession(userstore.db!, 'groupsession', sessionStore.sessionList[index].ID)
+        }
+        sessionStore.sessionList.splice(index, 1)
+        if (index == 0) {
+            router.push("/")
+        }
+    }
+    )
+
 }
 // 获取路由参数
 onBeforeMount(() => {

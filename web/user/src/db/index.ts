@@ -219,3 +219,18 @@ export function deleteNotice(db:IDBDatabase,msg:messageInt){
             }
         }
 }
+// 删除会话
+export function deleteSession(db:IDBDatabase,name:string,id:number){
+        const store  = db.transaction([name],'readwrite').objectStore(name)
+        const request = store.openCursor()
+        request.onsuccess = ()=>{
+            const cursor = request.result
+            if(cursor){
+                let d = cursor.value
+                if(d.ID == id){
+                    cursor.delete()    
+                }
+                cursor.continue()
+            }
+        }
+}

@@ -37,6 +37,14 @@ const routes = [
         path: '/ready',
         name: 'ready',
         component: () => import('@/views/ready.vue'),
+        beforeEnter: (to, from, next) => {
+            // 路由守卫
+            if (localStorage.getItem('token')) {
+                return false
+            }
+            next()
+                
+        },
         children: [
             {
                 path: '/',
@@ -51,9 +59,15 @@ const routes = [
         ]
     },
     {
-        path:'/rePassword',
+        path:'/repassword',
         name:"repassword",
-        component:()=>import('@/views/rePassword.vue')
+        component:()=>import('@/views/rePassword.vue'),
+        beforeEnter: (to, from, next)=> {
+            if(from.name != 'login' && from.name != 'user'){
+                return false
+            }
+            next()
+        },
     }
 ]
 const router = createRouter({
@@ -63,11 +77,8 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to) => {
     let token = localStorage.getItem("token")
-    if (!token && to.name != 'login' && to.name != 'register' && to.name != 'repassword') {
+    if (!token && to.name != 'login' && to.name != 'register') {
         return {name: 'login'}
-    }
-    if(to.path.startsWith("/ready")){
-        return {name:'/'}
     }
 })
 

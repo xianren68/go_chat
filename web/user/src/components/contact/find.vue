@@ -29,23 +29,23 @@ const sendRequest = () => {
     // 添加好友
     if (props.data.isUser) {
         send_msg = {
-            from_id: userstore.getUser()?.ID!,
+            from_id: userstore.userInfo.ID,
             target_id: props.data.ID,
             content: "",
             type: 3,
-            avatar: userstore.getUser()?.Avatar!,
-            send_name: userstore.getUser()?.Name!,
+            avatar: userstore.userInfo.Avatar,
+            send_name: userstore.userInfo.Name,
             send_time: now,
         }
     }else{
         // 请求加群
         send_msg = {
-            from_id: userstore.getUser()?.ID!,
+            from_id: userstore.userInfo.ID,
             target_id: props.data.OwnerId,
             content: "",
             type: 4,
-            avatar: userstore.getUser()?.Avatar!,
-            send_name: userstore.getUser()?.Name!,
+            avatar: userstore.userInfo.Avatar,
+            send_name: userstore.userInfo.Name,
             group_id: props.data.ID,
             group_name:props.data.Name,
             send_time: now,

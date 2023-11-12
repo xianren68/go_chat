@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onMounted} from "vue"
-import socket from "../../api/socket"
+import { ref, toRaw, onMounted,watch} from "vue"
+import socket from "@/api/socket"
 import meMsg from "@/components/session/meMsg.vue"
 import otherMsg from "@/components/session/otherMsg.vue"
 import { useSessionStore, useMessageStore } from "@/store"
@@ -65,6 +65,11 @@ const md = ref(false)
 const insertEmoji = (arg:string)=>{
     message.value += arg
 }
+watch(messageStore.messageList,()=>{
+    md.value =false
+    emojiShow.value = false
+    message.value = ""
+})
 // 消息数据
 const message = ref("")
 const main = ref()

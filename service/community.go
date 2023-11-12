@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"go_chat/common"
 	"go_chat/dao"
 	"go_chat/models"
@@ -13,16 +12,9 @@ import (
 func NewGroup(c *gin.Context) {
 	value, _ := c.Get("userId")
 	group := &models.Community{}
-	err := c.BindJSON(group)
-	if err != nil {
-		zap.S().Warn("failed to read arguments ", err)
-		c.JSON(200, gin.H{
-			"code": -1,
-			"msg":  "请求参数错误",
-		})
-		return
-	}
-	// 群名为空
+	_ = c.BindJSON(group)
+	group.OwnerId = value.(uint)
+	var code int
 	if group.Name == "" {
 		c.JSON(200, gin.H{
 			"code": 500,
@@ -30,13 +22,8 @@ func NewGroup(c *gin.Context) {
 		})
 		return
 	}
-	group.OwnerId = value.(uint)
-	code := dao.CreateCommunity(group)
+	code = dao.CreateCommunity(group)
 	if code != 0 {
-		//c.JSON(http.StatusOK, gin.H{
-		//	"code": -1,
-		//	"msg":  err.Error(),
-		//})
 		common.ErrReply(c, code)
 		return
 	}

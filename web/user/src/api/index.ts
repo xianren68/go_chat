@@ -34,3 +34,5 @@ export const updateUserInfo = (data:any)=>req.put('/auth/user/update',data)
 export const sendVerify = (data:{email:string})=>req.post('/sendverify',data)
 // 修改密码
 export const verfiyCode = (data:{email:string,code:string,password:string,id:string})=>req.post('/verifycode',data)
+// 创建群聊
+export const createCommunity = (data:{name:string})=>req.post('/auth/relation/newgroup',data)

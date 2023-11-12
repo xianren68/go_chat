@@ -27,9 +27,29 @@
     </div>
     <!--    列表-->
     <List :List="switchCt?contactStore.contactPerson:contactStore.groupList" v-model="selectIndex"></List>
+    <div class="newGroup" v-if="!switchCt" title="创建群聊">
+      <svg class="icon" @click="dialogFormVisible= true">
+        <use xlink:href="#icon-tianjia"></use>
+      </svg>
+    </div>
+    <el-dialog v-model="dialogFormVisible" title="创建群聊">
+      <el-form :model="form">
+        <el-form-item label="群名称" label-width="140px">
+          <el-input v-model="form.name" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="newGroup">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
     <div class="right">
-      <UserInfo v-if="selectIndex >=0 && switchCt" :information="contactStore.contactPerson[selectIndex]"></UserInfo>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -39,10 +59,9 @@ import { ref,reactive} from 'vue'
 import {useContactStore} from "../../store"
 import {onBeforeMount,watch} from "vue"
 import List from '@/components/contact/list.vue'
-import UserInfo from "@/components/contact/userInfo.vue"
 import {useRouter} from 'vue-router'
 import findVue from '@/components/contact/find.vue'
-import { getUserByName,getCommunityByName } from '@/api'
+import { getUserByName,getCommunityByName,createCommunity } from '@/api'
 import { ElMessage } from 'element-plus'
 import noticelist from '@/components/contact/noticelist.vue'
 import { useNoticeStore } from '../../store'
@@ -65,7 +84,9 @@ watch(selectIndex,(newSelect)=>{
   
   if(!switchCt.value){
     jumpSession(newSelect)
+    return
   }
+  router.push(`/contact/userinfo/${newSelect}`)
 })
 // 好友
 const contactStore = useContactStore()
@@ -118,6 +139,23 @@ const searchEnter = async ()=>{
   searchData.isUser = switchCt.value
   searchShow.value = true
 }
+// 控制创建群聊是否显示
+const dialogFormVisible = ref(false)
+const form = reactive({
+  name:""
+})
+// 创建群聊
+const newGroup = async ()=>{
+  dialogFormVisible.value = false
+  const {data} = await createCommunity({name:form.name})
+  if(data.code != 0){
+    ElMessage.error(data.msg)
+    return
+  }
+  ElMessage.success("创建成功")
+  contactStore.getGroupList()
+
+}
 // 挂载之前，获取用户列表
 onBeforeMount(()=>{
   selectIndex.value = -1
@@ -131,6 +169,7 @@ onBeforeMount(()=>{
 
 <style scoped lang="scss">
 .contact {
+  position: relative;
   display: flex;
   align-items: center;
   height: 100%;
@@ -206,6 +245,17 @@ onBeforeMount(()=>{
       .select{
         color: #008efe;
         border-bottom: #008efe 2px solid;
+      }
+
+    }
+    .newGroup{
+      position: absolute;
+      left:130px;
+      top:430px;
+      .icon {
+        height: 40px;
+        width: 40px;
+        fill:#f9dada;
       }
 
     }

@@ -11,7 +11,19 @@ const routes = [
                 {
                     name: 'contact',
                     path: 'contact',
-                    component: () => import('@/views/main/contact.vue')
+                    component: () => import('@/views/main/contact.vue'),
+                    children:[
+                        {
+                            path:'userinfo/:index',
+                            name:"userinfo",
+                            component: () => import('@/views/main/contact/userInfo.vue'),
+                            beforeEnter: (_to, from, next) => {
+                                if(from.name === 'contact'){
+                                    next()
+                                }
+                            }
+                        }
+                    ]
                 },
                 {
                     name: 'session',
@@ -21,7 +33,7 @@ const routes = [
                         {
                             name:'chat',
                             path:'chat',
-                            component:() => import('@/views/main/chat.vue')
+                            component:() => import('@/views/main/session/chat.vue')
                         }
                     ]
                 },
@@ -37,7 +49,7 @@ const routes = [
         path: '/ready',
         name: 'ready',
         component: () => import('@/views/ready.vue'),
-        beforeEnter: (to, from, next) => {
+        beforeEnter: (_to, _from, next) => {
             // 路由守卫
             if (localStorage.getItem('token')) {
                 return false
@@ -62,7 +74,7 @@ const routes = [
         path:'/repassword',
         name:"repassword",
         component:()=>import('@/views/rePassword.vue'),
-        beforeEnter: (to, from, next)=> {
+        beforeEnter: (_to, from, next)=> {
             if(from.name != 'login' && from.name != 'user'){
                 return false
             }

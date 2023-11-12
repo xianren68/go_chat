@@ -2,7 +2,7 @@
     <div class="info">
       <div class="main">
             <div class="avatar">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFrZh6NXKZ7x0WW0UR2pPf2pXOrCaFcd62Uw&usqp=CAU" alt="">
+              <img :src="information.Avatar" alt="">
             </div>
             <div class="gender">
               <svg class="icon" v-if="information.gender == 'female'">
@@ -45,14 +45,24 @@
     </div>
 </template>
 <script setup lang="ts">
-import {useRouter} from 'vue-router'
+import {useRouter,useRoute} from 'vue-router'
+import {onBeforeMount} from 'vue'
+import {useContactStore} from "@/store"
+const contactStore = useContactStore()
 // 路由
 const router = useRouter()
-defineProps(['information'])
+const route = useRoute()
 // 跳转到聊天页面
 const jumpMsg = (ID:number,Name:string,Avatar:string)=>{
   router.push({name:'session',query:{ID,Name,Avatar,type:1}})
 }
+let information:any = {}
+onBeforeMount(() => {
+  // 获取路由参数
+  console.log(route.params)
+  let index  = route.params.index
+  information = contactStore.contactPerson[parseInt(index)]
+})
 </script>
 
 <style scoped lang="scss">

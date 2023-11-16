@@ -24,6 +24,5 @@ declare module 'vue' {
     Previewmd: typeof import('./src/components/session/previewmd.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    UserInfo: typeof import('./src/components/contact/userInfo.vue')['default']
   }
 }
